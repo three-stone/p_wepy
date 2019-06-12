@@ -73,7 +73,7 @@ export default class extends wepy.app {
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
-      navigationBarTitleText: '康合上医',
+      navigationBarTitleText: '医疗',
       navigationBarTextStyle: 'black'     
     }
   }
