@@ -1,0 +1,76 @@
+<style lang="less">
+  @import '../../styles/common.less';
+page{
+	background:#f5f5f5;
+}
+.cell{
+	height:120rpx;
+}
+.cell_hd image{
+	height:68rpx;
+	width:68rpx;
+}
+.cell_hd{
+	margin-right:20rpx
+}
+.desc{
+	padding:40rpx 30rpx 15rpx 30rpx;
+	font-size:24rpx;
+	color:#999;
+	width:100%;
+	box-sizing:border-box;
+}
+</style>
+<template>
+  <view class="container">
+    <view class='desc'>选择要进行中医体质测评的家人</view>
+	<view class="cells">
+        <view class="cell">
+        	<view class='cell_hd'>
+        		<image src='../../assets/images/d_intagral_icon_num.png'></image>
+        	</view>	
+            <view class="cell__bd">
+                李家康（自己）
+            </view>          
+        </view>
+        <view class="cell">
+        	<view class='cell_hd'>
+        		<image src='../../assets/images/d_intagral_icon_num.png'></image>
+        	</view>	
+            <view class="cell__bd">
+                李家康（自己）
+            </view>
+        </view>
+        <view class="cell">
+        	<view class='cell_hd'>
+        		<image src='../../assets/images/d_intagral_icon_num.png'></image>
+        	</view>	
+            <view class="cell__bd">
+                李家康（自己）
+            </view>  
+        </view>
+    </view>	
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class ChoicePerson extends wepy.page {
+    config = {
+      navigationBarTitleText: '选择评测人'
+    }
+
+    components = {
+    }
+    data = {
+    }
+
+    computed = {
+    }
+
+    methods = {
+    }
+
+    onLoad() {
+    }
+  }
+</script>

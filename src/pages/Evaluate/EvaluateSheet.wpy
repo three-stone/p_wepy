@@ -1,0 +1,165 @@
+<style lang="less">
+@import '../../styles/common.less';
+page{
+  background:#f5f5f5;
+}
+  .nothing{
+  margin-top:180rpx;
+  width:100%;
+  text-align:center;
+
+}
+.cells{
+  border-top:1px solid #eaeaea;
+}
+.cell{
+  height:180rpx;
+  padding:40rpx 30rpx; 
+  box-sizing:border-box;
+  overflow:hidden;
+  width:100%;
+}
+.cell__bd{
+  width:100%;
+}
+.title{
+  font-size:30rpx;
+  line-height:36rpx;
+  width:100%;
+  padding-right:122rpx;
+  margin-bottom:17rpx;
+  max-height:74rpx;
+  overflow:hidden;
+  white-space:normal!important;
+  box-sizing:border-box;
+  display:-webkit-box;
+  word-break:break-all;
+  text-overflow:ellipsis;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+
+}
+.detail{
+  color:#999;
+  font-size:24rpx;
+  line-height:36rpx;
+  width:100%;
+  height:36rpx;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+
+}
+.hot,.integrated{
+  width:69px;
+  height:36px;
+  border-radius:4px;
+  color:#FF3631;
+  border:1px solid #FF3631;
+  font-size:24rpx;
+  padding:0 12rpx;
+  box-sizing:border-box;
+}
+.integrated{
+    color:#FF8700;
+  border:1px solid #FF8700;
+}
+</style>
+<template>
+  <view class="container"> 
+      <view class="cells">
+        <block  wx:for="{{ surveyList }}" wx:for-index="index" wx:for-item="item" wx:key="index">
+          <navigator url='/pages/Evaluate/AssessmentIndex?id={{item.id}}' hover-class="none" class="cell">
+              <view class="cell__bd">
+                <view class="title">{{item.surveyName}} <text class="hot" hidden>热门</text></view>
+                <view class='detail'>共{{item.surveyAnswerNum}}题</view>
+              </view>       
+          </navigator>
+        </block>
+<!--         <navigator url='' hover-class="none" class="cell">
+            <view class="cell__bd">
+              <view class="title">兑换中医推拿服务券 <text class="integrated">综合</text></view>
+              <view class='detail'>预计耗时60分钟</view>
+            </view>       
+        </navigator>
+        <navigator url='' hover-class="none" class="cell">
+            <view class="cell__bd">
+              <view class="title">广东省中医院肾病科慢性疾病管理门诊肾脏疾病生活质量简表-简化版</view>
+              <view class='detail'>预计耗时60分钟</view>
+            </view>       
+        </navigator> -->
+
+      </view> 
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showLoading } from '../../utils/common.js'
+  export default class Answer extends wepy.page {
+    config = {
+      navigationBarTitleText: '测评量表',
+      enablePullDownRefresh: true,
+      backgroundTextStyle: 'dark',
+      onReachBottomDistance: 50
+    }
+    components = {
+    }
+
+    data = {
+      surveyList: [],
+      pageNo: 1,
+      Isload: false,
+      totalPages: ''
+    }
+
+    computed = {
+    }
+
+    methods = {
+      radioChange(e) {
+        console.log(e)
+      }
+    }
+
+    events = {
+    }
+    //  下拉刷新
+    onPullDownRefresh () {
+      if (this.Isload) {
+        wepy.showNavigationBarLoading()
+        this.getsurvey()
+      }
+    }
+    //  获取列表
+    getsurvey () {
+      var that = this
+      let param = {
+        url: 'survey/answer/survey',
+        method: 'GET',
+        data: {},
+        header: {
+          'content-type': 'application/x-www-form-urlencoded' // 默认值
+        }
+      }
+      that.Isload = false
+      wepy.request(param).then((res) => {
+        that.surveyList = res.content.list
+        that.totalPages = res.content.totalPages
+        that.pageNo = res.content.pageNo
+        that.Isload = true
+        setTimeout(function () {
+          wepy.hideNavigationBarLoading()
+          wepy.stopPullDownRefresh()
+        }, 500)
+        this.$apply()
+      }).catch((res) => {
+        console.log(res)
+      })
+    }
+    onLoad() {
+      showLoading()
+      this.getsurvey()
+    }
+  }
+</script>

@@ -1,0 +1,37 @@
+<style lang="less">
+  @import '../../styles/common.less';
+  @import '../../utils/wxParse.wxss';
+</style>
+<template>
+  <view class="container">
+      <import src="../../utils/wxParse.wxml"/>
+      <template is="wxParse" data="{{wxParseData:article.nodes}}"/>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import WxParse from '../../utils/wxParse.js'
+  export default class Register extends wepy.page {
+    config = {
+      navigationBarTitleText: ''
+    }
+
+    components = {
+    }
+    data = {
+    }
+
+    computed = {
+    }
+
+    methods = {
+    }
+    events = {
+    }
+    onLoad() {
+      let article = wepy.getStorageSync('html')
+      WxParse.wxParse('article', 'html', article, this, 0)
+    }
+  }
+</script>

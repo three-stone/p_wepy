@@ -1,0 +1,205 @@
+<template>
+<view class="view-container">
+  <view class="banner-container">
+    <swiper class='slide-image' indicator-dots="true" autoplay="true" indicator-color="rgba(255, 255, 255, 1)" interval="{{interval}}" indicator-active-color="#26B7BC" duration="{{duration}}" circular="true" wx:if="{{centerNav.length!=0}}">
+      <block wx:for="{{centerNav}}" wx:key="{{index}}">
+        <swiper-item>
+          <image src="{{item.thumbnail}}" class="slide-image"/>
+        </swiper-item>
+      </block>
+    </swiper>
+    <image src='../../assets/images/default_jiankangxuanjiao.png' class='defaultpic' wx:else></image>
+  </view>
+  <view class="newsList-container">
+    <view class="newsList-child" wx:for="{{newsList}}" wx:for-index="index" wx:for-item="item" wx:key="index"  @tap="tap({{item.informationId}})">
+      <image class="newsList-img" mode="aspectFit" src="{{item.thumbnail}}"></image>
+      <view class='newsList-content'>
+        <text class="newsList-content-title">{{item.title}}</text>
+        <view class="newsList-content-label-container">
+          <text class="desc">{{item.label}}</text>
+          <view>
+              <text>{{item.newsCollect ==null || item.newsCollect == ''? 0 : item.newsCollect}} 收藏</text>
+              <text style="margin-left:30rpx;">{{item.newsReading ==null || item.newsReading == ''? 0 :item.newsReading}} 阅读</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view></view>
+</view>  
+</template>
+<script>
+  import wepy from 'wepy'
+  import { showLoading, showTost } from '../../utils/common.js'
+  import { GetBanner } from '../../apis/common.js'
+  export default class templates extends wepy.page {
+    config = {
+      'navigationBarTitleText': '健康资讯',
+      'enablePullDownRefresh': true,
+      'backgroundTextStyle': 'dark',
+      'onReachBottomDistance': 50
+    }
+
+    components = {
+    }
+
+    data = {
+      centerNav: [],
+      indicatorDots: true,
+      autoplay: true,
+      interval: 5000,
+      duration: 1000,
+      newsList: [],
+      Isload: false,
+      totalPages: null,
+      pageNo: 1
+    }
+
+    methods = {
+      tap(informationId) {
+        this.$navigate('./healthInforDetails?informationId=' + informationId)
+      }
+    }
+
+    events = {
+    }
+    getbanner () {
+      let that = this
+      let param = GetBanner({'count': 3, 'loc': 3, 'organizationId': 'ORG0000000000001', 'terminal': 3})
+      wepy.request(param).then((data) => {
+        console.log(data)
+        that.centerNav = data.content
+        this.$apply()
+      }).catch((data) => {
+        showTost(data.resultDesc)
+      })
+    }
+    getData (No) {
+      let that = this
+      showLoading()
+      let param = {
+        url: '/informationRecommendation/information/paginate',
+        method: 'get',
+        data: { pageNo: No, pageSize: 8 },
+        header: {
+          'content-type': 'application/x-www-form-urlencoded' // 默认值
+        }
+      }
+      that.Isload = false
+      wepy.request(param).then((data) => {
+        wepy.hideLoading()
+        let arry = that.newsList
+        that.Isload = true
+        that.totalPages = data.content.totalPages
+        No > 1 ? that.newsList = arry.concat(data.content.list) : that.newsList = data.content.list
+        setTimeout(function () {
+          wepy.hideNavigationBarLoading()
+          wepy.stopPullDownRefresh()
+        }, 500)
+        this.$apply()
+      }).catch((data) => {
+        that.Isload = true
+        setTimeout(function () {
+          wepy.hideNavigationBarLoading()
+          wepy.stopPullDownRefresh()
+        }, 500)
+        console.log(data)
+      })
+    }
+    //  下拉刷新
+    onPullDownRefresh () {
+      if (this.Isload) {
+        wepy.showNavigationBarLoading()
+        this.getData(1)
+      }
+    }
+    //  下拉加载
+    onReachBottom () {
+      if (this.Isload && this.pageNo <= this.totalPages) {
+        this.pageNo = this.pageNo + 1
+        this.getData(this.pageNo)
+      }
+    }
+    onLoad (option) {
+      showLoading()
+      this.getData(1)
+      this.getbanner()
+    }
+  }
+</script>
+<style lang="less">
+@import '../../styles/common.less';
+@30-padding: 50rpx;
+@full-width: 100%;
+.view-container {
+  padding-bottom: 20rpx;
+  background:rgba(245,245,245,1);
+}
+page{
+  background:#f5f5f5;
+}
+.banner-container {
+  width: @full-width;
+  height: 367rpx;
+  background:rgba(255,255,255,1);
+  .slide-image {
+    width: @full-width;
+    height: 367rpx;
+  }
+  .defaultpic{
+    width:100%;
+    height:100%;
+  }
+}
+.newsList-container {
+  background:rgba(255,255,255,1);
+  padding: 0 30rpx;
+  .newsList-child {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding: 38rpx 0;
+    padding-bottom:0;
+    width: @full-width;
+    .newsList-img {
+      width: 138rpx;
+      height: 184rpx;
+    }
+    .newsList-content {
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 464rpx;
+      height: 184rpx;
+      border-bottom: 1rpx solid rgba(234,234,234,1);
+      .newsList-content-title {
+        font-size:28rpx;
+        color:rgba(51,51,51,1);
+        line-height:42rpx;
+      }
+      .newsList-content-label-container {
+        padding-bottom: 37rpx;
+        display: inline-flex;
+        justify-content: space-between;
+        align-items: center;
+        width: @full-width;
+        height: 26rpx;
+        font-size:24rpx;
+        color:rgba(205,205,205,1);
+        .desc {
+          flex: 1;
+        }
+        view {
+          display: inline-flex;
+          flex: 1;
+          justify-content: flex-end;
+          align-items: center;
+          text{
+            text-align:right;
+          }
+        }
+      }
+    }
+  }
+}
+</styles>

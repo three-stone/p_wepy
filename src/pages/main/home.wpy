@@ -1,0 +1,692 @@
+<template>
+  <!-- banenr -->
+  <view class="banner">
+    <!-- <image class="banner-img" mode="scaleToFill" src="../../assets/images/banner.png"></image> -->
+      <swiper class='swiper' indicator-dots="true" autoplay="true" indicator-color="rgba(255, 255, 255, 1)" interval="{{interval}}" indicator-active-color="#26B7BC" duration="{{duration}}" circular="true" wx:if="{{bannerList.length!=0}}">
+        <block wx:for="{{bannerList}}" wx:key="{{index}}" >
+            <swiper-item>
+              <!--  <navigator hover-class='none' url='/pages/webview/webview?url={{item.outLink}}' style='height:100%;'> -->
+                <image src="{{item.url}}" title='Title' class="banner-img" @tap='getto({{item.forwardType}},{{index}})'></image>
+              <!-- </navigator> -->
+            </swiper-item>
+        </block>
+      </swiper>
+      <image src='../../assets/images/default_jiankangxuanjiao.png' class='defaultpic' wx:else></image>
+  </view>
+  <!-- nav-bar -->
+  <view class="nav-bar flex-container">
+    <view @tap="click({{index}})"  class="nav-child flex-child" wx:for="{{testNavBarObj}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+      <image src="{{item.pic}}"/>
+      <view class="nav-child-title">{{item.navChildTitle}}</view>
+    </view>
+  </view>
+  <!--Msg-->
+    <view class="cells" wx:if="{{Msg != null}}">
+      <view class="cell cell_access">
+        <view class="cell__hd">
+         <image style="width:72rpx;height:66rpx;margin-right:20rpx;" src='../../assets/images/s1.png'/>
+        </view>
+        <view class="cell__bd">
+            <view class='msg'>{{Msg.content}}</view>
+        </view>
+        <view class="cell__ft"></view>
+      </view>
+    </view> 
+  <view class="banner centerNav" wx:if="{{centerNav.length!=0}}">
+    <!-- <image class="banner-img" mode="scaleToFill" src="../../assets/images/banner.png"></image> -->
+      <swiper class='swiper' indicator-dots="{{false}}" autoplay="true" indicator-color="rgba(0, 0, 0, 1)" interval="{{interval}}" indicator-active-color="#FFFFFF" duration="{{duration}}" circular="true" wx:if="{{centerNav.length!=0}}">
+        <block wx:for="{{centerNav}}" wx:key="{{index}}" >
+            <swiper-item>
+               <navigator hover-class='none' url='/pages/webview/webview?url={{item.outLink}}' style='height:100%;'>
+                <image src="{{item.url}}" title='Title' class="banner-img" ></image>
+              </navigator>
+            </swiper-item>
+        </block>
+      </swiper>
+  </view>
+
+  <!-- content-service -->
+  <scroll-view class="content-scroll-container" scroll-y>
+    <view class="content service">
+      <view class="content-top-container">
+        <view class="content-top-title">
+          <view class="pseudo-icon"></view>
+          <text>服务网点</text>
+        </view>
+        <view class="content-top-more">
+          <navigator url='/pages/site/siteList' hover-class='none'>更多</navigator>
+          <view class="pseudo-arrow"></view>
+        </view>
+      </view>
+      <view class="sit-list-container">
+          <navigator class="site-content" url="/pages/site/siteDetails?id={{siteList.stationId}}" hover-class='none'>
+            <image class="site-image" src="{{siteList.organizationImg}}"/>
+            <view class="site-content-child">
+              <view class="site-content-title">{{siteList.organizationName}}</view>
+              <view class="site-content-label-container" wx:if="{{sitlabey.length != 0}}">
+                <view class="site-content-label-child" wx:for="{{sitlabey}}" wx:key="{{index}}">{{item}}</view>
+              </view>
+              <view class="site-content-label-location">
+                <image class="site-content-label-image" src="https://rs01.kanghehealth.com/wx/image/d_list_icon_adr.png?1152" wx:if="{{siteList.organizationAddress != ''&&siteList.organizationAddress != null}}" />
+                <text>{{siteList.organizationAddress}}</text>
+              </view>
+            </view>
+          </navigator>
+      </view>
+    </view>
+    <view class="content doctors-nav">
+      <view class="content-top-container">
+        <view class="content-top-title">
+          <view class="pseudo-icon"></view>
+          <text>中医名医</text>
+        </view>
+        <view class="content-top-more">
+          <navigator url="/pages/doctorList/doctorList" hover-class="none">更多</navigator>
+          <view class="pseudo-arrow"></view>
+        </view>
+      </view>
+      <view class="doctor-list-container">
+
+        <swiper class='swipers' indicator-dots="true"  indicator-color="#DCDCDC" indicator-active-color="#26B7BC" duration="{{duration}}" circular="true" wx:if="{{Doctorlist.length!=0}}">
+            <swiper-item>
+                <navigator url='/pages/doctorList/doctorCenter?id={{item.doctorId}}' hover-class='none' class="doctor-child" wx:for="{{Doctorlist}}" wx:for-index="index" wx:for-item="item" wx:key="index" wx:if="{{index <= 3}}">
+                  <view class="doctor-avatar" style="background:url({{item.doctorHead == ''? 'https://rs02.kanghehealth.com/wx/image/default_doctor.png' : item.doctorHead }}) center no-repeat;background-size:cover;"></view>
+                  <text class="doctor-name">{{item.doctorName}}</text>
+                  <text class="doctor-title">{{item.doctorTitle}}</text>
+                </navigator>
+            </swiper-item>
+            <swiper-item wx:if="{{Doctorlist.length>3}}">
+                <navigator url='/pages/doctorList/doctorCenter?id={{item.doctorId}}' hover-class='none' class="doctor-child" wx:for="{{Doctorlist}}" wx:for-index="index" wx:for-item="item" wx:key="index" wx:if="{{index > 3&&index<= 7}}">
+                <view class="doctor-avatar" style="background:url({{item.doctorHead == ''? 'https://rs02.kanghehealth.com/wx/image/default_doctor.png' : item.doctorHead }}) center no-repeat;background-size:cover;"></view>
+                  <text class="doctor-name">{{item.doctorName}}</text>
+                  <text class="doctor-title">{{item.doctorTitle}}</text>
+                </navigator>
+            </swiper-item>
+        </swiper>
+      </view>
+    </view>
+    <view class="content information">
+      <view class="content-top-container">
+        <view class="content-top-title">
+          <view class="pseudo-icon"></view>
+          <text>健康资讯</text>
+        </view>
+        <view class="content-top-more">
+          <navigator url='/pages/healthInfor/healthInfor' hover-class="none">更多</navigator>
+          <view class="pseudo-arrow"></view>
+        </view>
+      </view>
+      <navigator url="/pages/healthInfor/healthInforDetails?informationId={{item.newsId}}" hover-class='none' class="newsList-child" wx:for="{{newsList}}" wx:key='*this'>
+        <image class="newsList-img" mode="aspectFit" src="{{item.newsThumbnail}}"></image>
+        <view class='newsList-content'>
+          <text class="newsList-content-title">{{item.newsTitle}}</text>
+          <view class="newsList-content-label-container">
+            <text class='desc'>{{item.label}}</text>
+            <view>
+              <text>{{item.newsCollect ==null || item.newsCollect == ''? 0 : item.newsCollect}} 收藏</text>
+              <text style="margin-left:30rpx;">{{item.newsReading ==null || item.newsReading == ''? 0 :item.newsReading}} 阅读</text>
+            </view>
+          </view>
+        </view>
+      </navigator>
+    </view>
+  </scroll-view>
+  <!-- nav-bottom -->
+  <view class="nav-bottom flex-container">
+    <view class="nav-bottom-home flex-child nav-bottom-child">
+      <image class="icon-tab" mode="aspectFit" src="https://rs02.kanghehealth.com/wx/image/tab_home.png"/>
+      <text class="nav-bottom-text">医疗</text>
+    </view>
+    <view class="nav-bottom-personal flex-child nav-bottom-child" @tap='jump'>
+      <image class="icon-tab" mode="aspectFit" src="https://rs01.kanghehealth.com/wx/image/tab_b_shop_nor.png"/>
+      <text class="nav-bottom-text">商城</text>
+    </view>
+    <view class="nav-bottom-personal flex-child nav-bottom-child" @tap="skip">
+      <image class="icon-tab" mode="aspectFit" src="https://rs02.kanghehealth.com/wx/image/tab_me.png"/>
+      <text class="nav-bottom-text" >我的</text>
+    </view>
+  </view>
+  <view> </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showTost, showLoading } from '../../utils/common'
+  import { GetBanner, GetMsg } from '../../apis/common.js'
+  export default class templates extends wepy.page {
+    config = {
+      'backgroundTextStyle': 'light',
+      'navigationBarBackgroundColor': '#ffffff',
+      'navigationBarTitleText': '医疗'
+    }
+
+    components = {
+    }
+
+    data = {
+      autoplay: true,
+      interval: 5000,
+      duration: 1000,
+      indicatorDots: false,
+      bannerList: [],
+      siteList: [],
+      sitlabey: [],
+      testNavBarObj: [
+        { pic: 'https://rs02.kanghehealth.com/wx/image/a_icon_appointment.png', url: '/pages/Appointment/AppointmentRegister', navChildTitle: '预约挂号' },
+        { pic: 'https://rs02.kanghehealth.com/wx/image/a_icon_service.png', navChildTitle: '服务预约', url: '/pages/Appointment/AppointmentServer' },
+        { pic: 'https://rs02.kanghehealth.com/wx/image/a_icon_Outpatient.png', navChildTitle: '门诊缴费', url: '/pages/ClinicPay/ClinicPay' },
+        { pic: 'https://rs02.kanghehealth.com/wx/image/a_icon_Health.png', navChildTitle: '健康评估', url: '/pages/Evaluate/Heath' }
+      ],
+      centerNav: [],
+      Doctorlist: [],
+      newsList: [],
+      Msg: null
+    }
+
+    methods = {
+      click (idx) {
+        if (wepy.getStorageSync('memberInfo').idNumber === null || wepy.getStorageSync('memberInfo').idNumber === '') {
+          let num = idx + 1
+          let URL = '/pages/LoginRegister/BaseInformation?first=' + num
+          wepy.navigateTo({
+            url: URL
+          })
+        } else {
+          wepy.navigateTo({
+            url: this.testNavBarObj[idx].url
+          })
+        }
+      },
+      getto (obj, idx) {
+        switch (obj) {
+          case 1:
+            this.$navigate('/pages/webview/webview?url=' + this.bannerList[idx].outLink)
+            break
+          case 2:
+            let url = '/pages/product_detail?specCode=' + this.bannerList[idx].goodsId
+            this.other('wxb8e20bad42a77beb', url)
+            break
+          case 3:
+            wepy.setStorageSync('setinfo', this.bannerList[idx].text)
+            this.$navigate('/pages/Detail/Detail')
+            break
+        }
+      },
+      skip () {
+        this.other('wx8d82f1c3aa4d76b1', '')
+      },
+      jump () {
+        this.other('wxb8e20bad42a77beb', '')
+      }
+    }
+
+    events = {
+    }
+    other (appid, url) {
+      wepy.navigateToMiniProgram({
+        appId: appid,
+        path: url,
+        extraData: {
+          memberId: wepy.getStorageSync('memberId'),
+          KHSY_TOKEN_KEY: wepy.getStorageSync('KHSY_TOKEN_KEY'),
+          memberInfo: wepy.getStorageSync('memberInfo')
+        },
+        envVersion: 'release',
+        success(res) {
+          // 打开成功
+        }
+      })
+    }
+    getbanner () {
+      let that = this
+      let param = GetBanner({'count': 3, 'loc': 2, 'organizationId': 'ORG0000000000001', 'terminal': 3})
+      wepy.request(param).then((data) => {
+        that.centerNav = data.content
+        this.$apply()
+      }).catch((data) => {
+        showTost(data.resultDesc)
+      })
+    }
+    getMsg () {
+      let param = GetMsg({userId: wepy.getStorageSync('memberId')})
+      let that = this
+      wepy.request(param).then((data) => {
+        that.Msg = data.content
+      }).catch((data) => {
+
+      })
+    }
+    getData() {
+      let that = this
+      let param = {
+        url: '/homePageController/getHomePageData',
+        method: 'get',
+        data: { memberId: wepy.getStorageSync('memberId'), organizationId: 'ORG0000000000001', jwtToken: wepy.getStorageSync('KHSY_TOKEN_KEY'), terminal: 3, count: 3 },
+        header: {
+          'content-type': 'application/x-www-form-urlencoded' // 默认值
+        }
+      }
+      showLoading()
+      wepy.request(param).then((data) => {
+        that.bannerList = data.resultData.bannerList
+        that.Doctorlist = data.resultData.doctorFamousList
+        that.newsList = data.resultData.newsList
+        that.centerNav = data.resultData.middleBannerList
+        this.$apply()
+      }).catch((data) => {
+        showTost(data.resultDesc)
+      })
+    }
+    onShareAppMessage (res) {
+      return {
+        title: '医聊',
+        path: '/pages/main/home'
+      }
+    }
+    onShow () {
+      if (wepy.getStorageSync('memberId').length !== 0) {
+        let that = this
+        wx.getLocation({
+          type: 'gcj02',
+          success: (res) => {
+            showLoading()
+            let params = {
+              url: '/branches/getHomePageServiceNetwork',
+              method: 'get',
+              data: { jwtToken: wepy.getStorageSync('KHSY_TOKEN_KEY'), memberId: wepy.getStorageSync('memberId'), latitude: res.latitude, longitude: res.longitude },
+              header: {
+                'content-type': 'application/x-www-form-urlencoded' // 默认值
+              }
+            }
+            wepy.request(params).then((data) => {
+              wepy.hideLoading()
+              that.siteList = data.resultData
+              if (data.resultData.organizationProject !== '' && data.resultData.organizationProject !== null) {
+                that.sitlabey = data.resultData.organizationProject.split(',')
+              }
+              this.$apply()
+            }).catch((data) => {
+              showTost(data.resultDesc)
+            })
+          }
+        })
+      }
+    }
+    onLoad (option) {
+      if (wepy.getStorageSync('memberId').length === 0) {
+        wepy.reLaunch({
+          url: '/pages/LoginRegister/Login'
+        })
+      } else {
+        this.getData()
+        this.getMsg()
+      }
+    }
+  }
+</script>
+<style lang="less">
+@import '../../styles/common.less';
+@30-padding: 50rpx;
+@full-width: 100%;
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .flex-child {
+    flex: 1;
+  }
+}
+.swipers{
+  width:100%;
+  height:240rpx;
+  swiper-item{
+    display:flex;
+  }
+}
+.cell{
+  height:129rpx;
+  margin-top:16rpx;
+  background:#fff;
+  .cell__bd{
+    view{
+      font-size:26rpx;
+      color:#333;
+    }
+  }
+}
+.msg{
+  width:530rpx;
+  height:34rpx;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.cells{
+  background:#ebebeb;
+}
+    .site-content {
+      display: flex;
+      padding: 30rpx 0 32rpx;
+      border-bottom: 1rpx solid rgba(234,234,234,1);
+      .site-image {
+        width: 108rpx;
+        height: 108rpx;
+      }
+      .site-content-child {
+        padding-left: 19rpx;
+        height: 108rpx;
+        width:566rpx;
+        .site-content-title {
+          font-size: 28rpx;
+          color: rgba(51,51,51,1);
+        }
+        .site-content-label-container {
+          height:52rpx;
+          overflow:hidden;
+          .site-content-label-child {
+            display: inline-flex;
+            padding: 7rpx 10rpx;
+            margin-right: 15rpx;;
+            font-size: 24rpx;
+            color: rgba(153,153,153,1);
+            background: rgba(245,245,245,1);
+            border-radius: 8rpx;
+          }
+        }
+        .site-content-label-location {
+          font-size: 24rpx;
+          color: rgba(205,205,205,1);
+          .site-content-label-image {
+            margin-right: 7rpx;
+            width: 22rpx;
+            height: 20rpx;
+          }
+        }
+      }
+    }
+.banner {
+  width: @full-width;
+  height: 320rpx;
+  background-color: #ebebeb;
+  .swiper{
+    width:@full-width;
+    height:320rpx;
+  }
+  .defaultpic{
+    width:100%;
+    height:100%;
+  }
+  .banner-img {
+    position: relative;
+    z-index: 1;
+    width: @full-width;
+    height: 320rpx;
+  }
+}
+.centerNav{
+  height:182rpx;
+  padding-top:16rpx;
+  .swiper{
+    width:@full-width;
+    height:100%;
+  }
+  .banner-img{
+    height: 100%;
+  }
+}
+.nav-bar {
+  width: @full-width;
+  padding: 31rpx 0 @30-padding;
+  height: 134rpx;
+  .nav-child {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    text-align: center;
+    .nav-child-icon {
+      display: inline-flex;
+      height: 88rpx;
+    }
+    .nav-child-title {
+      font-size: 28rpx;
+      color: #333333;
+      font-family: PingFangSC-Regular;
+    }
+    image{
+      width:88rpx;
+      height:88rpx;
+    }
+  }
+}
+.content-scroll-container {
+  background-color: #ebebeb;
+  padding-bottom: 120rpx;
+  .content {
+    padding-left: 32rpx;
+    padding-right: 32rpx;
+    margin-top: 16rpx;
+    background:rgba(255,255,255,1);
+    .content-top-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      width: @full-width;
+      padding: 24rpx 0 24rpx;
+      .content-top-title {
+        display: inline-flex;
+        flex: 1;
+        text-align: left;
+        font-size: 26rpx;
+        color: rgba(38,183,188,1);
+        .pseudo-icon {
+          margin-top: 4rpx;
+          margin-right: 8rpx;
+          width: 9rpx;
+          height: 26rpx;
+          background:rgba(38,183,188,1);
+          border-radius:4rpx;
+        }
+      }
+      .content-top-more {
+        position: relative;
+        display: inline-flex;
+        flex: 1;
+        text-align: right;
+        font-size: 24rpx;
+        color: rgba(153,153,153,1);
+        navigator {
+          position: absolute;
+          top: -8rpx;
+          right: 30rpx;
+        }
+        .pseudo-arrow {
+          position: absolute;
+          top: 0;
+          right: 30rpx;
+
+        }
+        .pseudo-arrow:after, .pseudo-arrow:before{
+          position: absolute;
+          content: "";
+          display: inline-block;
+          height: 16rpx;
+          width: 16rpx;
+          border-width: 1px 1px 0 0;
+          border-color: #C8C8CD;
+          border-style: solid;
+          -webkit-transform: matrix(0.71, 0.71, -0.71, 0.71, 0, 0);
+          transform: matrix(0.71, 0.71, -0.71, 0.71, 0, 0);
+        }
+      }
+    }
+  }
+  .doctors-nav {
+    display: flex;
+    height:346rpx;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: column;
+    .doctor-list-container {
+      display: inline-flex;
+      width: @full-width;
+      .doctor-child {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        width:25%;
+        justify-content:flex-start;
+        .doctor-avatar {
+          width: 110rpx;
+          height: 110rpx;
+          border-radius:50%;
+        }
+        .doctor-name {
+          font-size:26rpx;
+          height:42rpx;
+          overflow: hidden;
+          color:rgba(51,51,51,1);
+        }
+        .doctor-title {
+          font-size:24rpx;
+          height:32rpx;
+          width:100%;
+          text-align:center;
+          overflow:hidden;
+          text-overflow:ellipsis;
+          white-space:nowrap;
+          color:rgba(153,153,153,1);
+          box-sizing:border-box;
+        }
+      }
+    }
+  }
+  .information {
+    .information-child {
+      width: @full-width;
+      height: 198rpx;
+      .information-child-img {
+        width: 184rpx;
+        height: 138rpx;
+      }
+      .information-child-content {
+        padding-bottom: 36rpx;
+        position: relative;
+        float: right;
+        width: 464rpx;
+        height: 138rpx;
+        border-bottom: 1rpx solid #EAEAEA;
+        .title {
+          font-size:28rpx;
+          height:60rpx;
+          color:rgba(51,51,51,1);
+          line-height:30rpx;
+          word-break: break-all;
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          -o-text-overflow: ellipsis;
+          text-overflow: ellipsis;
+        }
+        .label {
+          position: absolute;
+          left: 0;
+          width:100%;
+          bottom: 36rpx;
+          font-size:24rpx;
+          color:rgba(153,153,153,1);
+          overflow:hidden;
+          text-overflow:ellipsis;
+          white-space:nowrap;
+        }
+      }
+    }
+  }
+}
+.nav-bottom {
+  width: @full-width;
+  height: 98rpx;
+  position: fixed;
+  bottom:0;
+  z-index:100;
+  background:#fff;
+  .nav-bottom-child {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    color: #999999;
+    &:nth-child(1) {
+     color: #26B7BC;
+    }
+    .icon-tab {
+      width: 41rpx;
+      height: 41rpx;
+    }
+    .nav-bottom-text {
+      font-size:22rpx;
+    }
+  }
+}
+  .newsList-child {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding: 38rpx 0;
+    padding-bottom:0;
+    width: @full-width;
+    .newsList-img {
+      width: 138rpx;
+      height: 184rpx;
+    }
+    .newsList-content {
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 464rpx;
+      height: 184rpx;
+      border-bottom: 1rpx solid rgba(234,234,234,1);
+      .newsList-content-title {
+          font-size:28rpx;
+          height:60rpx;
+          color:rgba(51,51,51,1);
+          line-height:30rpx;
+          word-break: break-all;
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          -o-text-overflow: ellipsis;
+          text-overflow: ellipsis;
+      }
+      .newsList-content-label-container {
+        padding-bottom: 37rpx;
+        display: inline-flex;
+        justify-content: space-between;
+        align-items: center;
+        width: @full-width;
+        height: 26rpx;
+        font-size:24rpx;
+        color:rgba(205,205,205,1);
+        .desc {
+          flex: 1;
+          overflow:hidden;
+          text-overflow:ellipsis;
+          white-space:nowrap;
+        }
+        view {
+          display: inline-flex;
+          flex: 1;
+          justify-content: flex-end;
+          align-items: center;
+          text{
+            text-align:right;
+          }
+        }
+      }
+    }
+  }
+</style>

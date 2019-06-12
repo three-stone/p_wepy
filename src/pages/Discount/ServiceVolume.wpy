@@ -1,0 +1,214 @@
+<style lang="less">
+
+page{
+  background:#F5F5F5;
+}
+.container{
+  padding-bottom:190rpx;
+}
+.explain{
+  padding:40rpx 30rpx 20rpx 30rpx;
+  font-size:24rpx;
+  color:#999999;
+  width:100%;
+  box-sizing:border-box;
+}
+.cartlist{
+  padding:0 30rpx;
+}
+.cartItem{
+  width:100%;
+  display:flex;
+  height:240rpx;
+  align-items:center;
+  margin-bottom:21rpx;
+  background:url(https://rs02.kanghehealth.com/wx/image/a_bg_coupon.png) 0 0 no-repeat;
+  background-size:100% 240rpx;
+  border-radius:8px;
+  padding:50rpx 61rpx 40rpx 42rpx;
+  box-sizing:border-box;
+}
+.cart{
+  width:640rpx;
+}
+.content{
+  display:flex;
+}
+.footer{
+  height:130rpx;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+  position: fixed;
+  bottom:0;
+  width:100%;
+}
+.sure_btn{
+  width:628rpx;
+  height:90rpx;
+  background:rgba(38,183,188,1);
+  border-radius:45px;
+  line-height:90rpx;
+  text-align:center;
+  color:#fff;
+  font-size:32rpx;
+  letter-spacing:20rpx;
+}
+.checkbox{
+  width:32rpx;
+   image{
+      width:32rpx;
+      height:32rpx;
+    }
+}
+/* 未选中的 背景样式 */
+checkbox .wx-checkbox-input{
+   border-radius: 50%;
+   width: 32rpx; 
+   height: 32rpx; 
+}
+/* 选中后的 背景样式 */
+checkbox .wx-checkbox-input.wx-checkbox-input-checked{
+   border: none;
+   background: #26B7BC;
+}
+/* 选中后的 对勾样式  */
+checkbox .wx-checkbox-input.wx-checkbox-input-checked::before{
+   border-radius: 50%;
+   width: 32rpx;
+   height: 32rpx;
+   line-height: 32rpx;
+   text-align: center;
+   font-size:28rpx; 
+   color:#fff; 
+   background: transparent;
+   transform:translate(-50%, -50%) scale(1);
+   -webkit-transform:translate(-50%, -50%) scale(1);
+}
+.cartname{
+  color:#333333;
+  font-size:34rpx;
+  margin-bottom:38rpx;
+}
+.use,.time{
+  font-size:26rpx;
+  color:#999;
+}
+</style>
+<template>
+  <view class="container">
+      <view class='explain'>
+          说明：每次只能使用一张服务券  
+      </view>
+      <view class="cartlist">
+ 
+          <block wx:for="{{items}}" wx:key="*this" >
+            <view class='cartItem' @tap="click({{index}})">
+                <view class="cart">
+                    <view class='cartname'>{{item.name}}</view>
+                    <view class='use'>使用该券可抵扣对应服务的费用品</view>
+                    <view class='time'>有效期：截止 {{item.validityEnd}}</view>
+                </view>
+                <view class='checkbox'> 
+                  <image wx:if="{{selected == index}}" src="https://rs02.kanghehealth.com/wx/image/icon_choose_sel.png"></image>
+                  <image wx:else src="https://rs02.kanghehealth.com/wx/image/icon_choose_nor.png"></image>  
+                </view>
+            </view>
+           
+          </block>
+
+      </view>
+      <view class='footer'>
+          <view class='sure_btn' @tap="sure">确认</view>
+      </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showTost } from '../../utils/common.js'
+  import { GetServiceCard } from '../../apis/common.js'
+  export default class AmountCard extends wepy.page {
+    config = {
+      navigationBarTitleText: '使服务券',
+      'navigationBarTextStyle': 'black',
+      'enablePullDownRefresh': true,
+      'backgroundTextStyle': 'dark',
+      'navigationBarBackgroundColor': '#ffffff',
+      'onReachBottomDistance': 50
+    }
+    components = {
+    }
+
+    data = {
+      items: [],
+      selected: null,
+      Isload: false,
+      totalPages: null,
+      code: '',
+      pageNo: 1
+    }
+
+    computed = {
+    }
+    methods = {
+      click (idx) {
+        this.selected = idx
+      },
+      sure () {
+        if (this.items.length !== 0 && this.selected !== null) {
+          wepy.removeStorageSync('AmountValue')
+          wepy.removeStorageSync('price')
+          wepy.setStorageSync('ServiceCartId', this.items[this.selected].code)
+          wepy.navigateBack({
+            delta: 1
+          })
+        } else {
+          showTost('请先选择服务卷！')
+        }
+      }
+    }
+    //  下拉刷新
+    onPullDownRefresh () {
+      if (this.Isload) {
+        wepy.showNavigationBarLoading()
+        this.getData(this.code, 1)
+      }
+    }
+    //  下拉加载
+    // onReachBottom () {
+    //   if (this.Isload && this.pageNo <= this.totalPages) {
+    //     this.pageNo = this.pageNo + 1
+    //     this.getData(this.code, this.pageNo)
+    //   }
+    // }
+    events = {
+    }
+    getData (code, No) {
+      let that = this
+      that.Isload = false
+      let param = GetServiceCard({memberId: wepy.getStorageSync('memberId'), singleServiceCode: code, pageSize: No, pageNo: 10})
+      wepy.request(param).then((data) => {
+        that.Isload = true
+        let arry = that.items
+        No > 1 ? that.items = arry.concat(data.content.list) : that.items = data.content.list
+        setTimeout(function () {
+          wepy.hideNavigationBarLoading()
+          wepy.stopPullDownRefresh()
+        }, 500)
+        this.$apply()
+      }).catch((data) => {
+        setTimeout(function () {
+          wepy.hideNavigationBarLoading()
+          wepy.stopPullDownRefresh()
+        }, 500)
+        showTost(data.resultDesc)
+      })
+    }
+    onLoad(e) {
+      this.getData(e.type, 1) // e.type
+      this.code = e.type
+    }
+  }
+</script>

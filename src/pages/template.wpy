@@ -1,0 +1,33 @@
+<template>
+  <view class="templates-container">
+    templates
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class templates extends wepy.page {
+    config = {
+      'backgroundTextStyle': 'light',
+      'navigationBarBackgroundColor': '#ffffff',
+      'navigationBarTitleText': '医疗',
+      'navigationBarTextStyle': 'black'
+    }
+
+    components = {
+    }
+
+    data = {
+    }
+
+    methods = {
+    }
+
+    events = {
+    }
+
+    onLoad (option) {
+    }
+  }
+</script>

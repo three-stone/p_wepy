@@ -1,0 +1,316 @@
+<style lang="less">
+  @import '../../styles/common.less';
+  page{
+    background:#fff;
+  }
+  .container{
+    padding-bottom:80rpx;
+  }
+  .cell{
+    padding:50rpx 60rpx 30rpx 60rpx;
+    height:120rpx;
+    box-sizing:border-box;
+
+  }
+  .cell__ft{
+    font-size:28rpx;
+    color:#333333;
+  }
+  .cell:before {
+    left:60rpx;
+    right:60rpx;
+  }
+  .cell_b:after{
+    content: " ";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 1px;
+    border-top: 4rpx solid #EAEAEA;
+    color: #e5e5e5;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+    left:60rpx;
+    right:60rpx;
+    z-index: 2;
+  }
+  .sub_btn{
+    width:628rpx;
+    height:90rpx;
+    background:rgba(38,183,188,1);
+    border-radius:45rpx;
+    color:#fff;
+    font-size:32rpx;
+    text-align:center;
+    line-height:90rpx;
+    margin:0 auto;
+    margin-top:80rpx;
+  }
+  .disabled{
+    opacity:0.5;
+  }
+  .pld{
+    font-size:28rpx;
+    color:rgba(205,205,205,1);
+  }
+  .head{
+    height:200rpx;
+    width:100%;
+    background:#fff;
+    color:#333;
+    font-size:48rpx;
+    padding-top:146rpx;
+    box-sizing:border-box;
+    padding-left:59rpx;
+    margin-bottom:16rpx;
+  }
+  .desc{
+    padding-left:59rpx;
+    font-size:26rpx;
+    color:#999;
+    margin-bottom:40rpx;
+  }
+  .link{
+    display:flex;
+    width:628rpx;
+    padding:20rpx;
+    margin:0 auto;
+    box-sizing:border-box;
+    justify-content:space-between;
+        navigator{
+          color:#26B7BC;
+          font-size:26rpx;
+        }
+  }
+  .footer{
+    position: fixed;
+    width:500rpx;
+    left:125rpx;
+    bottom:38rpx;
+    font-size:24rpx;
+    color:#333333;
+    display:flex;
+      navigator{
+          color:#26B7BC;
+          font-size:22rpx;
+      }
+  }
+  .admin{
+    background:#fff;
+    margin-top:42rpx;
+    border:1px solid #3CB2B9;
+    color:#26B7BC;
+  }
+  .code{
+    padding-left:20rpx;
+    border-left:1px solid #eaeaea;
+    color:#26B7BC;
+    font-size:24rpx;
+  }
+</style>
+<template>
+  <view class="container">
+      <view class="head">
+        完善个人资料
+      </view>
+      <text class='desc'>完善个人资料有利于获取更多增值服务</text>
+      <view class="cells">
+           <view class="cell">
+              <view class="cell__bd">
+                 <input type="text" placeholder="身份证号" value="{{idNumber}}" @input="idchange" placeholder-class="pld"></input>
+              </view>
+          </view>
+          <view class="cell">
+              <view class="cell__bd">
+                 <input type="text" placeholder="姓名" value="{{name}}" @input='namechange' placeholder-class="pld"></input>
+              </view>
+          </view>
+          <view class="cell">
+              <view class="cell__bd">
+                 <picker @change="bindPickerChange" value="{{index}}" range="{{sex}}" >
+                  <view class="picker">
+                  <text class='pld' wx:if="{{index == 2}}">性别</text>{{sex[index]}}
+                  </view>
+                </picker>
+              </view>
+          </view>
+          <view class="cell">
+              <view class="cell__bd">
+                 <input type="text" placeholder="出生日期:YYYY-MM-DD" value="{{birthday}}" @input="bchange" placeholder-class="pld"></input>
+              </view>
+          </view>
+          <view class="cell">
+              <view class="cell__bd">
+                 <input type="text" placeholder="身高（cm）" value="{{height}}" @input='hchange' placeholder-class="pld"></input>
+              </view>
+          </view>
+          <view class="cell cell_b">
+              <view class="cell__bd">
+                  <input type="text" placeholder="体重（kg）" value="{{weight}}" @input='wchange' placeholder-class="pld"></input>
+              </view>
+          </view>
+      </view>
+      <view class="sub_btn {{idNumber.length == 0 || name.length == 0 ?'disabled':''}}" @tap="{{idNumber.length != 0 && name.length != 0 ?'submit':''}}">保存</view>
+       <view class="sub_btn admin" @tap="click">稍后填写</view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showTost } from '../../utils/common.js'
+  export default class Register extends wepy.page {
+    config = {
+      navigationBarTitleText: '完善个人资料'
+    }
+
+    components = {
+    }
+    data = {
+      idNumber: '',
+      name: '',
+      birthday: '',
+      height: '',
+      weight: '',
+      jwtToken: '',
+      memberId: '',
+      first: '',
+      sex: ['男', '女'],
+      index: 2
+    }
+
+    computed = {
+    }
+
+    methods = {
+      idchange (e) {
+        this.idNumber = e.detail.value
+      },
+      namechange (e) {
+        this.name = e.detail.value
+      },
+      bchange (e) {
+        this.birthday = e.detail.value
+      },
+      hchange (e) {
+        this.height = e.detail.value
+      },
+      wchange (e) {
+        this.weight = e.detail.value
+      },
+      click () {
+        let url
+        console.log(this.first)
+        switch (this.first) {
+          case '0':
+            url = '/pages/LoginRegister/Login'
+            wepy.clearStorageSync()
+            break
+          case '1':
+            url = '/pages/Appointment/AppointmentRegister'
+            break
+          case '2':
+            url = '/pages/Appointment/AppointmentServer'
+            break
+          case '3':
+            url = '/pages/ClinicPay/ClinicPay'
+            break
+          case '4':
+            url = '/pages/Evaluate/Heath'
+            break
+          default:
+            break
+        }
+        if (this.first === 0) {
+          wepy.reLaunch({
+            url: url
+          })
+        } else {
+          wepy.redirectTo({
+            url: url
+          })
+        }
+      },
+      bindPickerChange (e) {
+        this.index = e.detail.value
+      },
+      submit () {
+        let that = this
+        let regIdNo = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/
+        if (!regIdNo.test(this.idNumber)) {
+          showTost('身份证号填写有误')
+          return false
+        }
+        if (this.name === '') {
+          showTost('姓名不能为空')
+          return false
+        }
+        if (this.birthday.length === 0) {
+          showTost('日期不能为空')
+          return false
+        }
+        let reg = /^(\d{4})-(\d{2})-(\d{2})$/
+        reg.exec(this.birthday)
+        if (!reg.test(this.birthday) && this.birthday.length !== 0) {
+          showTost('日期格式错误')
+          return false
+        }
+        if (RegExp.$2 > 12 || RegExp.$3 > 31) {
+          showTost('请输入正确的日期')
+          return false
+        }
+        let param = {
+          url: '/userController/updateMemberInfo',
+          method: 'get',
+          data: {idNumber: this.idNumber, jwtToken: this.jwtToken, memberId: this.memberId, name: this.name, height: this.height, weight: this.weight, birthday: this.birthday, sex: this.index},
+          header: {
+            'content-type': 'application/x-www-form-urlencoded' // 默认值
+          }
+        }
+        wepy.request(param).then((data) => {
+          let url
+          switch (that.first) {
+            case 0:
+              url = '/pages/LoginRegister/Login'
+              wepy.clearStorageSync()
+              break
+            case 1:
+              url = '/pages/Appointment/AppointmentRegister'
+              break
+            case 2:
+              url = '/pages/Appointment/AppointmentServer'
+              break
+            case 3:
+              url = '/pages/ClinicPay/ClinicPay'
+              break
+            case 4:
+              url = '/pages/Evaluate/Heath'
+              break
+            default:
+              break
+          }
+          if (this.first === 0) {
+            wepy.reLaunch({
+              url: url
+            })
+          } else {
+            wepy.redirectTo({
+              url: url
+            })
+          }
+        }).catch((error) => {
+          showTost(error.resultDesc)
+        })
+      }
+    }
+    events = {
+    }
+    onLoad(e) {
+      this.first = e.first
+      this.memberId = wepy.getStorageSync('memberId')
+      this.jwtToken = wepy.getStorageSync('KHSY_TOKEN_KEY')
+    }
+  }
+</script>

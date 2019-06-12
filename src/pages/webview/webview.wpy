@@ -1,0 +1,40 @@
+<style lang="less">
+  @import '../../styles/common.less';
+  page{
+    background:#fff;
+  }
+  .container{
+    padding-bottom:51rpx;
+  }
+</style>
+<template>
+  <view class="container">
+      <web-view src="{{url}}"></web-view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class Register extends wepy.page {
+    config = {
+      navigationBarTitleText: ''
+    }
+
+    components = {
+    }
+    data = {
+      url: ''
+    }
+
+    computed = {
+    }
+
+    methods = {
+    }
+    events = {
+    }
+    onLoad(e) {
+      this.url = e.url
+    }
+  }
+</script>

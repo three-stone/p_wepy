@@ -1,0 +1,492 @@
+<template>
+  <view class="container">
+    <view class="weui-navbar">
+      <block wx:for-items="{{tabs}}" wx:key="{{index}}">
+        <view id="{{index}}" class="weui-navbar__item " bindtap="tabClick">
+          <view class="weui-navbar__title {{activeIndex == index ? 'weui-bar__item_on' : 'weui-bar__item_off'}}">{{item}}</view>
+        </view>
+      </block>
+
+    </view>
+    <view class="weui-tab__panel"> 
+        <!------------------------------订单-------------------------------->
+         <view hidden="{{activeIndex != 0}}">
+            <view class="empty" hidden="{{MallOrderCount != 0}}">
+                <image class="empty-image" src="https://rs02.kanghehealth.com/wx/image/default_binglixiangqing@2x.png" />
+                <text class="empty-text">您还没有任何严选订单记录</text>
+            </view>
+            <view hidden="{{MallOrderCount == 0}}">  
+                <view  class="mallorder-item"  wx:for="{{OrderList.orderOrder}}" wx:key="*this">
+                    <view  class="mallorder-item-title"  bindtap="">
+                        <text class="datetime">{{item.orderDate}}</text>
+                        <text class="status">待支付</text>
+                    </view>
+                    <view  class="mallorder-item-productList" wx:for="{{item.detail}}" wx:key="*this">
+                        <view class='goodsItem'>
+                            <view class="ItemLeft">
+                                <image class="goshop-image" src="{{item.coverImage}}" />
+                            </view>
+                            <view class="ItemRight">
+                                <view class="CartName">{{item.goodsName}}</view>
+                                <view class="CartType">{{item.specName}}</view>
+                                <view class="PriceBox">
+                                    <text class="Price">¥{{item.detailAmount}}</text>
+                                    <text class='num'>x{{item.detailCount}}</text>
+                                </view>
+                            </view>
+                        </view> 
+                    </view>
+                    <view class="mallorder-item-price">
+                        <text>共计{{item.totalCount}}件商品 合计：¥</text>
+                        <text class="price-big">{{item.totalAmt}}</text>
+                        <text>元（含运费¥{{item.transFee}}元）</text>
+                    </view>
+                    <view class="mallorder-item-operate">
+                        <text class="confirm-receipt" @tap="topay({{item.orderCode}},{{item.totalAmt}})">去支付</text>
+                    </view>
+                </view> 
+            </view>
+         </view>
+        <!------------------------------预约订单-------------------------------->
+        <view   hidden="{{activeIndex !=1}}">
+            <view class="empty" hidden="{{AppointOrderCount != 0}}">
+                <image class="empty-image" src="https://rs02.kanghehealth.com/wx/image/default_binglixiangqing@2x.png" />
+                <text class="empty-text">您还没有任何预约订单记录</text>
+            </view>
+            <view hidden="{{AppointOrderCount == 0}}">
+                <view  class="AppointOrder-item"  bindtap="" wx:for="{{OrderList.bespeakOrder}}" wx:key="*this">
+                    <view  class="AppointOrder-item-title">
+                        <text class="datetime">{{item.orderDate}}</text>
+                        <text class="status">待支付</text>
+                    </view>
+                    <view  class="AppointOrder-item-content">
+                        <text class="weight">{{speakOrdertype[item.bespeakType]}}</text>
+                        <text>机构：{{item.bespeakUnitName}}</text>
+                        <text>服务人员：{{item.bespeakProject}}</text>
+                        <text>预约时间：{{item.bespeakDate}}  {{item.bespeakTime}}</text> 
+                    </view>
+                     <view class="mallorder-item-operate">
+                        <text class="confirm-receipt" @tap="topay({{item.orderCode}},{{item.payAmt}})">去支付</text>
+                    </view>
+                </view>
+            </view>
+         </view> 
+        <!------------------------------处方订单-------------------------------->
+  
+        <view   hidden="{{activeIndex != 2}}">
+            <view class="empty" hidden="{{PrescriptionOrderCount != 0}}">
+                <image class="empty-image" src="https://rs02.kanghehealth.com/wx/image/default_binglixiangqing@2x.png" />
+                <text class="empty-text">您还没有任何处方订单记录</text>
+            </view>
+            <view hidden="{{PrescriptionOrderCount == 0}}">
+                <view  class="PrescriptionOrder-item"  bindtap=""  wx:for="{{OrderList.prescribeOrder}}" wx:key="*this">
+                    <view  class="PrescriptionOrder-item-title">
+                        <text>{{item.orderState}}</text>
+                        <text class="status">待支付</text>
+                    </view>
+                    <view  class="PrescriptionOrder-item-content">
+                        <text>机构：{{item.unitName}}</text>
+                        <text>科室：{{item.departmentName}}</text>
+                        <text>医生：{{item.doctorName}}</text>
+                        <text>诊断：{{item.diagnose}}</text> 
+                    </view>
+                    <view class="PrescriptionOrder-item-price">
+                        <text>共计{{item.totalProject}}件商品 合计：¥</text>
+                        <text class="price-big">{{item.payAmt}}</text>
+                        <text>元（含运费¥{{item.transAmt}}元）</text>
+                    </view>
+                    <view class="PrescriptionOrder-item-operate"> 
+                        <text class="go-pay" @tap="topay({{item.orderCode}},{{item.payAmt}})">立即支付</text> 
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class MyOrder extends wepy.page {
+    config = {
+      navigationBarTitleText: '待支付订单'
+    }
+
+    data = {
+      tabs: ['严选订单', '预约订单', '处方订单'],
+      ordertype: ['待支付', '已结算', '待发货', '待收货', '已完成', '已取消', '已评价'],
+      speakOrderstatus: ['待支付', '预约成功', '已就诊', '已取消'],
+      speakOrdertype: ['0', '预约服务', '预约挂号'],
+      prescribeOrderstatus: ['0', '待支付', '已取消', '交易成功'],
+      activeIndex: 0,
+      Index: 0,
+      MallOrderCount: 1, // 严选订单数量
+      AppointOrderCount: 1, // 预约订单数量
+      PrescriptionOrderCount: 1, // 处方单数量
+      OrderList: ''
+    }
+    components = {
+
+    }
+    computed = {}
+
+    methods = {
+      tabClick(e) {
+        this.sliderOffset = e.currentTarget.offsetLeft
+        this.activeIndex = e.currentTarget.id
+        this.getData(wepy.getStorageSync('memberInfo').memberCode, this.activeIndex)
+      },
+      pickChange(e) {
+        this.index = e.detail.value
+      },
+      topay(code, price) {
+        wepy.navigateTo({
+          url: `/pages/Appointment/PayConfirm?orderId=${code}&price=${price}`
+        })
+      }
+    }
+    onLoad() {
+
+    }
+    onShow () {
+      this.getData(wepy.getStorageSync('memberInfo').memberCode, 0)
+    }
+    getData(membercode, index) {
+      let that = this
+      let param = {
+        url: 'appUser/prescribeOrder/getToBePaidOrderList/' + membercode,
+        method: 'get',
+        data: {},
+        header: {
+          'content-type': 'application/x-www-form-urlencoded' // 默认值
+        }
+      }
+      wepy.request(param).then((data) => {
+        if (index === 0) {
+          console.log(index)
+          that.OrderList = data.resultData
+          that.MallOrderCount = data.resultData.orderOrder.length
+        } else if (index === 1) {
+          console.log(index)
+          that.OrderList = data.resultData
+          that.AppointOrderCount = data.resultData.bespeakOrder.length
+        } else if (index === 2) {
+          console.log(index)
+          that.OrderList = data.resultData
+          that.PrescriptionOrderCount = data.resultData.prescribeOrder.length
+        }
+        this.$apply()
+      })
+    }
+  }
+</script>
+<style lang="less">
+  @import '../../styles/common.less';
+  page {
+    background: #F5F5F5;
+  }
+
+  .container {
+    font-size: 26rpx;
+    color: #333333;
+    background-color: #f5f5f5; 
+    
+
+    .weui-navbar {
+      position: fixed;
+      width: 100%;
+      background: #fff;
+      z-index: 99999;
+      margin-top: 1rpx;
+       .weui-navbar__item { 
+            float: left;
+            width: 33.33%;
+            text-align: center;
+            height: 88rpx;
+            line-height: 88rpx; 
+            
+            border-bottom: 3px solid #fff;
+             .weui-navbar__title {
+                border-bottom: 3px solid #fff;
+                color: #26B7BB;
+                margin: 0 25%;
+            }
+              .weui-bar__item_on { 
+                    border-color: #26B7BB; 
+                } .weui-bar__item_off { 
+                    color: #999999; 
+                }
+        }
+    }
+    .weui-tab__panel{
+        padding-top: 100rpx;
+        width: 100%;
+        .empty {
+            position: fixed;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            .empty-image {
+                height: 250rpx;
+                width: 300rpx;
+                padding-top: 200rpx;
+            }
+            .empty-text {
+                height: 90rpx;
+                width: 300rpx;  
+                color: #999999;
+                line-height: 90rpx;
+                font-size: 24rpx;
+                display: inline-flex;
+                justify-content: center;
+                margin-top: 50rpx;
+            }
+        }
+        .mallorder-item{            
+            background-color: #ffffff;
+            margin-top: 16rpx;
+            .mallorder-item-title{
+                line-height: 80rpx;
+                display: flex;                
+                justify-content: space-between;
+                padding: 0 30rpx;
+                .datetime{
+                    color: #999999;
+                }
+                .status{
+                    color:#26B7BC;
+                }
+            }
+             .goodsItem {
+                display: flex;
+                padding: 30rpx;
+                position: relative;
+                height: 110rpx; 
+                background-color: #fafafa;
+                border-top: 1rpx #ffffff solid;
+                 .ItemLeft image {
+                    height: 110rpx;
+                    width: 110rpx;
+                    margin-right: 30rpx;
+                }
+
+                .ItemRight {
+                    width: 100%;
+                      .CartName,
+                    .detail .name {
+                        font-size: 28rpx;
+                        color: #333333;
+                    }
+
+                    .CartType {
+                        font-size: 24rpx;
+                        color: #999;
+                        margin: 6rpx 0;
+                    }
+
+                    .PriceBox {
+                        display: flex;
+                        width: 100%;
+                        justify-content: space-between;
+                    }
+
+                    .Price {
+                        font-size: 30rpx;
+                        color: #FF8700;
+                    }
+
+                    .num {
+                        font-size: 28rpx;
+                        color: #333333;
+                    }
+                }
+
+                .ItemRight view {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+            .mallorder-item-price{ 
+                height: 90rpx;
+                line-height: 90rpx;
+                text-align:right;
+                padding:0 30rpx;
+                font-size:24rpx; 
+                .price-big{
+                    font-size:30rpx; 
+                }
+            }
+            .mallorder-item-operate{ 
+                height: 90rpx;
+                text-align:right;
+                padding:0 13rpx;
+                border-top:1rpx #eaeaea solid;
+
+                .show-Logistic {
+                    line-height: 54rpx;
+                    height: 54rpx;
+                    width: 150rpx;
+                    margin: 17rpx;
+                    border: 1rpx #eaeaea solid;
+                    border-radius: 28rpx;  
+                    font-size: 28rpx;
+                    display: inline-flex;
+                    justify-content: center; 
+                }
+                .confirm-receipt{
+                    line-height: 54rpx;
+                    height: 54rpx;
+                    width: 150rpx;
+                    margin: 17rpx;
+                    border: 1rpx #26B7BC solid;
+                    border-radius: 28rpx; 
+                    color: #26B7BC; 
+                    font-size: 28rpx;
+                    display: inline-flex;
+                    justify-content: center; 
+                }
+            }
+           
+        }
+
+        .AppointOrder-item{            
+            background-color: #ffffff;
+            margin-top: 16rpx;
+             .AppointOrder-item-title{
+                line-height: 80rpx;
+                display: flex;                
+                justify-content: space-between;
+                padding: 0 30rpx;
+                .datetime{
+                    color: #999999;
+                }
+                .status{
+                    color:#26B7BC;
+                }
+            }
+            .AppointOrder-item-content{
+                border-top:1rpx #eaeaea solid; 
+                display: flex;
+                flex-direction: column;
+                height: 210rpx;
+                text{
+                    padding: 0 30rpx;
+                    color: #999999;
+                    line-height: 36rpx;
+                }
+                .weight{
+                    font-weight: 600; 
+                     color: #333333;
+                     padding:28rpx 0 20rpx 30rpx;
+
+                }
+            }
+            .mallorder-item-operate{ 
+                height: 90rpx;
+                text-align:right;
+                padding:0 13rpx;
+                border-top:1rpx #eaeaea solid;
+
+                .show-Logistic {
+                    line-height: 54rpx;
+                    height: 54rpx;
+                    width: 150rpx;
+                    margin: 17rpx;
+                    border: 1rpx #eaeaea solid;
+                    border-radius: 28rpx;  
+                    font-size: 28rpx;
+                    display: inline-flex;
+                    justify-content: center; 
+                }
+                .confirm-receipt{
+                    line-height: 54rpx;
+                    height: 54rpx;
+                    width: 150rpx;
+                    margin: 17rpx;
+                    border: 1rpx #26B7BC solid;
+                    border-radius: 28rpx; 
+                    color: #26B7BC; 
+                    font-size: 28rpx;
+                    display: inline-flex;
+                    justify-content: center; 
+                }
+            }
+        }
+        .PrescriptionOrder-item{
+            background-color: #ffffff;
+            margin-top: 16rpx;
+             .PrescriptionOrder-item-title{
+                line-height: 80rpx;                
+                color: #999999;
+                display: flex;                
+                justify-content: space-between;
+                padding: 0 30rpx; 
+                .status{
+                    color:#26B7BC;
+                }
+            }
+            .PrescriptionOrder-item-content{
+                border-top:1rpx #eaeaea solid; 
+                border-bottom:1rpx #eaeaea solid; 
+                display: flex;
+                flex-direction: column;
+                height:170rpx;
+                padding:20rpx 0;
+                text{
+                    padding: 0 30rpx;
+                    color: #999999;
+                    line-height: 45rpx;
+                } 
+            }
+            .PrescriptionOrder-item-price{ 
+                height: 90rpx;
+                line-height: 90rpx;
+                text-align:right;
+                padding:0 30rpx;
+                font-size:24rpx; 
+                .price-big{
+                    font-size:30rpx; 
+                }
+            }
+            .PrescriptionOrder-item-operate{
+                 height: 90rpx;
+                text-align:right;
+                padding:0 13rpx; 
+
+                .hasPay {
+                    line-height: 54rpx;
+                    height: 54rpx;
+                    width: 150rpx;
+                    margin: 17rpx;
+                    border: 1rpx #eaeaea solid;
+                    border-radius: 28rpx;  
+                    font-size: 28rpx;
+                    display: inline-flex;
+                    justify-content: center; 
+                    color: #999999;
+                }
+                .go-pay{
+                    line-height: 54rpx;
+                    height: 54rpx;
+                    width: 150rpx;
+                    margin: 17rpx;
+                    border: 1rpx #26B7BC solid;
+                    border-radius: 28rpx; 
+                    color: #26B7BC; 
+                    font-size: 28rpx;
+                    display: inline-flex;
+                    justify-content: center; 
+                }
+            }
+        }
+    }
+   
+
+
+  
+  }
+</style>

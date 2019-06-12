@@ -1,0 +1,63 @@
+<style lang="less">
+.container{
+background:#fff;
+}
+.hd{
+  padding:40rpx 0;
+  width:100%;
+  box-sizing:border-box;
+ text-align:center;
+ font-size:36rpx;
+ line-height:50rpx;
+ color:#333333;
+ font-weight:600;
+}
+.text{
+    font-weight: 400;
+    font-size: 24rpx;
+    color: #666;
+    line-height:36rpx;
+    padding:0 30rpx 40rpx 30rpx;
+}
+.h4{
+  font-size:28rpx;
+  color:#333;
+  margin-top:40rpx;
+}
+</style>
+<template>
+  <view class="container">
+    <view class="text ">
+
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class TermOfService extends wepy.page {
+    config = {
+      navigationBarTitleText: '条款'
+    }
+    components = {
+    }
+
+    data = {
+    }
+
+    computed = {
+    }
+
+    methods = {
+      radioChange(e) {
+        console.log(e)
+      }
+    }
+
+    events = {
+    }
+
+    onLoad() {
+    }
+  }
+</script>

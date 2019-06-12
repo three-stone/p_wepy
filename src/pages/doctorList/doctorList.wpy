@@ -1,0 +1,204 @@
+<template>
+  <view class="doctor-list-container">
+    <view class="doctor-list-child" wx:for="{{doctorList}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+      <navigator url='/pages/doctorList/doctorCenter?id={{item.doctorId}}' class="doctor-content" hover-class='none'>
+        <view class='doctor-image' style="background:url({{item.avatar == ''? 'https://rs02.kanghehealth.com/wx/image/default_doctor.png' :item.avatar}}) center no-repeat;background-size:cover;"></view>
+        <view class="doctor-content-child">
+          <!-- title -->
+          <text class="doctor-content-name">{{item.doctorName}}</text>
+          <text class="doctor-content-title">{{item.doctorTitle}}</text>
+          <!-- label -->
+          <view class="doctor-content-position-container">
+            <view class="doctor-content-position" >{{item.serviceOutletOrganization}}</view>
+            <view class="doctor-content-label" wx:if="{{item.advantage.length !== 0}}">擅长: {{item.advantage}}</view>
+          </view>
+          <!-- specialize -->
+          <view class="doctor-content-specialize">
+            <text>{{item.point}}</text>
+          </view>
+        </view>
+      </navigator>
+      <view class="btn-reserve-container">
+        <view class="btn-reserve {{item.isConsult ? '' :'unselect'}}">
+          <navigator url="{{item.isConsult ? '/pages/advisory/Apply?id='+item.accountId: ''}}" hover-class='none'>咨询</navigator>
+        </view>
+        <view class="btn-reserve {{item.isSubscribe ? '':'unselect'}}">
+          <navigator url="{{item.isSubscribe ? '/pages/Appointment/AppointmentRegister':''}}" hover-class='none'>预约</navigator>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showTost, showLoading } from '../../utils/common.js'
+  export default class templates extends wepy.page {
+    config = {
+      'navigationBarBackgroundColor': '#ffffff',
+      'navigationBarTitleText': '医生列表',
+      'navigationBarTextStyle': 'black',
+      'enablePullDownRefresh': true,
+      'backgroundTextStyle': 'dark',
+      'onReachBottomDistance': 50
+    }
+
+    components = {
+    }
+
+    data = {
+      Isload: false,
+      totalPages: null,
+      pageNo: 1,
+      doctorList: []
+    }
+
+    customData = {
+      doctorList: []
+    }
+
+    methods = {
+    }
+    //  下拉刷新
+    onPullDownRefresh () {
+      if (this.Isload) {
+        wepy.showNavigationBarLoading()
+        this.getDoctorList(1)
+      }
+    }
+    //  下拉加载
+    onReachBottom () {
+      if (this.Isload && this.pageNo <= this.totalPages) {
+        this.pageNo = this.pageNo + 1
+        this.getDoctorList(this.pageNo)
+      }
+    }
+    // 获取医生列表
+    getDoctorList(No) {
+      let that = this
+//      showLoading()
+      let param = {
+        url: '/doctorRecommendation/doctor/paginate',
+        method: 'get',
+        data: { pageNo: No, pageSize: 1000 },
+        header: {
+          'content-type': 'application/x-www-form-urlencoded' // 默认值
+        }
+      }
+      that.Isload = false
+      wepy.request(param).then((data) => {
+        let arry = that.doctorList
+        wepy.hideLoading()
+        that.Isload = true
+        that.totalPages = data.totalPages
+        that.doctorList = data.resultData
+        No > 1 ? that.doctorList = arry.concat(data.content) : that.doctorList = data.content
+        setTimeout(function () {
+          wepy.hideNavigationBarLoading()
+          wepy.stopPullDownRefresh()
+        }, 500)
+        this.$apply()
+      }).catch((data) => {
+        that.Isload = true
+        wepy.hideNavigationBarLoading()
+        wepy.stopPullDownRefresh()
+        showTost(data.resultDesc)
+      })
+    }
+
+    events = {
+    }
+
+    onLoad (option) {
+      showLoading()
+      this.getDoctorList(1)
+    }
+  }
+</script>
+<style lang="less">
+@import '../../styles/common.less';
+@30-padding: 50rpx;
+@full-width: 100%;
+page {
+  padding-top: 16rpx;
+  background: #f5f5f5;
+}
+.doctor-list-container {
+  width: @full-width;
+  height: 100%;
+  background:rgba(245,245,245,1);
+  .doctor-list-child {
+    padding: 0 30rpx;
+    margin-bottom: 16rpx;
+    background:rgba(255,255,255,1);
+    .doctor-content {
+      display: flex;
+      padding: 30rpx 0 32rpx;
+      border-bottom: 1rpx solid rgba(234,234,234,1);
+      .doctor-image {
+        width: 108rpx;
+        height: 108rpx;
+        border-radius:50%;
+      }
+      .doctor-content-child {
+        padding-left: 19rpx;
+        height: 108rpx;
+        .doctor-content-name {
+          color: rgba(51,51,51,1);
+          font-size: 34rpx;
+        }
+        .doctor-content-title {
+          margin-left: 12rpx;
+          font-size: 24rpx;
+          color: rgba(51,51,51,1);
+        }
+        .doctor-content-position-container {
+          .doctor-content-position {
+            font-size: 24rpx;
+            color: rgba(153,153,153,1);
+          }
+          .doctor-content-label{
+            width:520rpx;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            font-size:24rpx;
+            color:#999999;
+            height:32rpx;
+          }
+        }
+        .doctor-content-specialize {
+          font-size: 24rpx;
+          color: rgba(153,153,153,1);
+          .doctor-content-label-image {
+            margin-right: 7rpx;
+            width: 17rpx;
+            height: 20rpx;
+          }
+        }
+      }
+    }
+    .btn-reserve-container {
+      display: flex;
+      justify-content: flex-end;
+      padding: 20rpx 0;
+      .btn-reserve {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 30rpx;
+        width: 150rpx;
+        height: 57rpx;
+        background: rgba(38,183,188,1);
+        border-radius: 29rpx;
+        font-size: 24rpx;
+        color: rgba(255,255,255,1);
+        line-height: 36rpx;
+      }
+      .unselect{
+        background:rgba(205,205,205,1);
+      }
+    }
+  }
+}
+</style>

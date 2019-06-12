@@ -1,0 +1,234 @@
+<style lang="less">
+
+page{
+  background:#F5F5F5;
+}
+.container{
+  padding-bottom:190rpx;
+}
+.explain{
+  padding:32rpx 30rpx 22rpx 30rpx;
+  font-size:24rpx;
+  color:#999999;
+  width:100%;
+  box-sizing:border-box;
+}
+.cartlist{
+  padding:0 30rpx;
+}
+.cartItem{
+  width:100%;
+  display:flex;
+  height:240rpx;
+  align-items:center;
+  margin-bottom:21rpx;
+}
+.cart{
+  width:640rpx;
+  height:240rpx;
+  margin-left:18rpx;
+  background:url(https://rs02.kanghehealth.com/wx/image/a_bg_moneyard.png) 0 0 no-repeat;
+  background-size:640rpx 240rpx;
+  padding:24rpx 39rpx 20rpx 112rpx;
+  box-sizing:border-box;
+}
+.cart view{
+  color:#fff;
+}
+.content{
+  display:flex;
+}
+.left{
+  width:326rpx;
+  border-right:1px dashed #fff;
+  font-size:20rpx;
+}
+.left view{
+  margin-bottom:8rpx;
+  width:100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.left .cartname{
+  font-size:30rpx;
+}
+.where{
+  height:35rpx;
+}
+.left .time{
+  margin-bottom:0;
+}
+.right{
+  width:136rpx;
+  padding-left:23rpx;
+  display:flex;
+  align-items:center;
+  flex-wrap:nowrap;
+}
+.right view{
+  font-size:22rpx;
+}
+.right .price{
+  font-size:32rpx;
+  margin-top:6rpx;
+}
+.footer{
+  height:130rpx;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+  position: fixed;
+  bottom:0;
+  width:100%;
+}
+.sure_btn{
+  width:628rpx;
+  height:90rpx;
+  background:rgba(38,183,188,1);
+  border-radius:45px;
+  line-height:90rpx;
+  text-align:center;
+  color:#fff;
+  font-size:32rpx;
+  letter-spacing:20rpx;
+}
+.checkbox{
+  width:32rpx;
+    image{
+      width:32rpx;
+      height:32rpx;
+    }
+}
+</style>
+<template>
+  <view class="container">
+      <view class='explain'>
+          说明：金额卡可以多张叠加使用  
+      </view>
+      <view class="cartlist">
+          <block wx:for="{{items}}" wx:key="*this" >
+            <view class='cartItem' @tap="click({{index}})">
+               <view class='checkbox'> 
+                  <image wx:if="{{item.checked}}" src="https://rs02.kanghehealth.com/wx/image/icon_choose_sel.png"></image>
+                  <image wx:else src="https://rs02.kanghehealth.com/wx/image/icon_choose_nor.png"></image>  
+                </view>
+                <view class="cart">
+                      <view class="content">
+                          <view class='left'>
+                              <view class='cartname'>{{item.name}}</view>
+                              <view class='where'>{{item.typeName}}</view>
+                              <view class='worth'>面值{{item.nominalValue}}元</view>
+                              <view class='use'>{{item.instructiont}}</view>
+                              <view class='time'>有效期：截止{{item.validityEnd}}</view>
+                          </view>
+                          <view class="right">
+                            <view>
+                              <view>余额</view>
+                              <view class='price'>￥{{item.balance}}</view>
+                            </view>
+                          </view>
+                      </view>
+                </view>
+            </view>
+          </block>
+      </view>
+      <view class='footer'>
+          <view class='sure_btn' @tap="sure">确认</view>
+      </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showTost, showLoading } from '../../utils/common.js'
+  import { GetAmountCard } from '../../apis/common.js'
+  export default class AmountCard extends wepy.page {
+    config = {
+      navigationBarTitleText: '使用金额卡'
+    }
+    components = {
+    }
+
+    data = {
+      items: [],
+      selected: null,
+      price: ''
+    }
+
+    computed = {
+    }
+
+    methods = {
+      checkboxChange(e) {
+        console.log(e)
+      },
+      click (idx) {
+        let price = 0
+        let item = this.items
+        item.forEach((res) => {
+          if (res.checked) {
+            price += Number(res.balance)
+          }
+        })
+        price = Number(this.price) - price
+        if (price > 0) {
+          item[idx].checked = !item[idx].checked
+          this.items = item
+        } else {
+          showTost('您所选择的金额卡余额已足够支付本订单，无需继续选择。')
+        }
+      },
+      sure () {
+        let arry = []
+        let price = 0
+        let newprice = this.price
+        this.items.forEach((item) => {
+          if (item.checked) {
+            newprice = Number(newprice) - Number(item.balance)
+            let obj = {
+              cardAmt: item.balance,
+              cardNo: item.code
+            }
+            if (newprice >= 0) {
+              obj.cardAmt = item.balance
+            } else {
+              obj.cardAmt = (Number(item.balance) + Number(newprice)).toFixed(2)
+            }
+            price += Number(item.balance)
+            arry.push(obj)
+          }
+        })
+        if (arry.length !== 0) {
+          wepy.removeStorageSync('ServiceCartId')
+          wepy.setStorageSync('AmountValue', arry)
+          wepy.setStorageSync('price', price)
+          wepy.navigateBack({
+            delta: 1
+          })
+        } else {
+          showTost('请先选择金额卡')
+        }
+      }
+    }
+
+    events = {
+    }
+
+    getData () { //  'e4883e10bc5741be9bbd0832ae603609'
+      let that = this
+      let param = GetAmountCard({ memberId: wepy.getStorageSync('memberId'), type: 1 })
+      wepy.request(param).then((data) => {
+        that.items = data.resultData
+        this.$apply()
+      }).catch((data) => {
+        showTost(data.resultDesc)
+      })
+    }
+    onLoad(e) {
+      showLoading()
+      this.price = e.price
+      this.getData()
+    }
+  }
+</script>

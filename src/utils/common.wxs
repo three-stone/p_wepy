@@ -1,0 +1,8 @@
+var search = function(obj, num) {
+	if(obj==null||num==null) return -1
+	return obj.indexOf(num)
+}
+
+module.exports = {
+ search: search 
+}

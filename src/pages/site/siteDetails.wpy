@@ -1,0 +1,300 @@
+<template>
+  <view class="site-detail-top">
+    <view class="site-name">{{detil.name}}</view>
+    <view class="site-time"></view>
+  </view>
+  <!-- 地图预留 -->
+  <view class="map-container">
+    <map id="map" longitude="{{detil.longitude}}" latitude="{{detil.latitude}}" scale="14" controls="{{controls}}" markers="{{markers}}" show-location style="width: 100%; height: 360rpx;"></map>
+  </view>
+  <!-- 地图附件 -->
+  <view class="map-kit-container">
+    <view class="map-kit-child map-kit-loaction">
+      <view>{{detil.provinceName==''|| detil.provinceName== null ? ' ': detil.provinceName}} {{detil.cityName==''|| detil.cityName== null ? ' ': detil.cityName}} {{detil.districtName==''|| detil.districtName== null ? ' ': detil.districtName}} {{detil.detailAddress==''|| detil.detailAddress== null ? ' ': detil.detailAddress}}</view>
+      <view></view>
+    </view>
+    <view class="map-kit-child map-kit-pic">
+      <view>网点高清图（1张）</view>
+      <view @tap="previewImage">点击查看</view>
+    </view>
+    <view class="map-kit-content">
+      <view class="title">服务项目</view>
+      <view class="content">{{detil.organizationService}}</view>
+    </view>
+  </view>
+  <!-- 服务 -->
+<!--   <view class="service-title">服务人员</view>
+  <view class="service-container"> -->
+<!--     <view class="doctor-list-container">
+  <view class="doctor-list-child" wx:for="{{doctorList}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+    <view class="doctor-content">
+      <image class="doctor-image" src="{{item.imgUrl}}"/>
+      <view class="doctor-content-child">
+        title
+        <text class="doctor-content-name">{{item.doctorName}}</text>
+        <text class="doctor-content-title">{{item.doctorTitle}}</text>
+        label
+        <view class="doctor-content-position-container">
+          <view class="doctor-content-label-child" wx:for="{{item.labelList}}" wx:for-index="index" wx:for-item="items" wx:key="index">{{items}}</view>
+          <view class="doctor-content-position" >{{item.position}}</view>
+        </view>
+        specialize
+        <view class="doctor-content-specialize">
+          <text>{{item.specialize}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="btn-reserve-container">
+      <view class="btn-reserve">
+        <view>咨询</view>
+      </view>
+      <view class="btn-reserve">
+        <view>预约</view>
+      </view>
+    </view>
+  </view>
+</view> -->
+<!--   <view class="doctor-list-container">
+  <view class="doctor-list-child" wx:for="{{doctorList}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+    <view class="doctor-content">
+      <image class="doctor-image" src="{{item.avatar == ''? 'https://rs02.kanghehealth.com/wx/image/default_doctor.png' : item.avatar }}"/>
+      <view class="doctor-content-child">
+        title
+        <text class="doctor-content-name">{{item.doctorName}}</text>
+        <text class="doctor-content-title">{{item.doctorTitle}}</text>
+        label
+        <view class="doctor-content-position-container">
+          <view class="doctor-content-label-child" wx:for="{{item.labelList}}" wx:for-index="index" wx:for-item="items" wx:key="index">{{items}}</view>
+          <view class="doctor-content-position" >{{item.organizationName}}</view>
+        </view>
+        specialize
+        <view class="doctor-content-specialize">
+          <text>{{item.point}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="btn-reserve-container">
+      <view class="btn-reserve">
+        <navigator url='/pages/advisory/advisoryOL?id={{item.accountId}}' hover-class='none'>咨询</navigator>
+      </view>
+      <view class="btn-reserve {{item.isConsult ? '':'unselect'}}">
+        <navigator url="{{item.isConsult ? '':'/pages/Appointment/AppointmentRegister'}}" hover-class='none'>预约</navigator>
+      </view>
+    </view>
+  </view>
+</view> -->
+<!--   </view> -->
+  <view></view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showTost, showLoading } from '../../utils/common.js'
+  export default class templates extends wepy.page {
+    config = {
+      'navigationBarBackgroundColor': '#ffffff',
+      'navigationBarTitleText': '网点详情',
+      'navigationBarTextStyle': 'black'
+    }
+
+    components = {
+    }
+
+    data = {
+      Isload: false,
+      totalPages: null,
+      pageNo: 1,
+      detil: '',
+      doctorList: [],
+      imgalist: [],
+      markers: [{
+        iconPath: 'https://rs01.kanghehealth.com/wx/image/d_list_icon_adr.png',
+        id: 0,
+        latitude: '',
+        longitude: '',
+        width: 20,
+        height: 20
+      }]
+    }
+
+    methods = {
+      previewImage () {
+        wepy.previewImage({
+          //  current: current, 当前显示图片的http链接
+          urls: this.imgalist // 需要预览的图片http链接列表
+        })
+      }
+    }
+
+    events = {
+    }
+    onLoad (option) {
+      let that = this
+      showLoading()
+      let param = {
+        url: `/branches/getServiceNetworkHomePage/${option.id}`,
+        method: 'get',
+        data: {},
+        header: {
+          'content-type': 'application/x-www-form-urlencoded' // 默认值
+        }
+      }
+      wepy.request(param).then((data) => {
+        wepy.hideLoading()
+        that.detil = data.resultData
+        let arry = []
+        let mark = that.markers
+        mark[0].latitude = data.resultData.latitude
+        mark[0].longitude = data.resultData.longitude
+        that.markers = mark
+        arry.push(data.resultData.logo)
+        that.imgalist = arry
+        this.$apply()
+      }).catch((data) => {
+        showTost(data.resultDesc)
+      })
+    }
+  }
+</script>
+<style lang="less">
+@import '../../styles/common.less';
+@30-padding: 50rpx;
+@full-width: 100%;
+page {
+  padding-top: 16rpx;
+  background: #eeeeee;
+  .site-detail-top {
+    padding: 24rpx 30rpx;
+    width: @full-width;
+    background: rgba(255,255,255,1);
+    .site-name {
+      font-size: 34rpx;
+      color: rgba(51,51,51,1);
+    }
+    .site-time {
+      font-size: 24rpx;
+      color: rgba(51,51,51,1);
+    }
+  }
+  .map-container {
+    width: @full-width;
+  }
+  .map-kit-container {
+    padding: 0 30rpx;
+    background: rgba(255,255,255,1);
+    .map-kit-child {
+      padding: 36rpx 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 28rpx;
+      color: rgba(51,51,51,1);
+      border-bottom: 1rpx solid rgba(234,234,234,1);
+    }
+    .map-kit-loaction {
+      view {
+        &:nth-child(2) {
+          font-size: 24rpx;
+          color: rgba(51,51,51,1);
+        }
+      }
+    }
+    .map-kit-pic {
+      view {
+        &:nth-child(2) {
+          font-size: 24rpx;
+          color: rgba(38,183,188,1);
+        }
+      }
+    }
+    .map-kit-content {
+      padding: 36rpx 0;
+      font-size: 28rpx;
+      color: rgba(51,51,51,1);
+      .content {
+        margin-top: 30rpx;
+        font-size: 26rpx;
+        color: rgba(153,153,153,1);
+        line-height: 40rpx;
+      }
+    }
+  }
+  .service-title {
+    padding: 20rpx 20rpx;
+    font-size: 28rpx;
+    color: rgba(51,51,51,1);
+  }
+  .service-container {
+    width: @full-width;
+    background: rgba(234,234,234,1);
+    .doctor-list-container {
+      width: @full-width;
+      height: 100%;
+      background:rgba(245,245,245,1);
+      .doctor-list-child {
+        padding: 0 30rpx;
+        margin-bottom: 16rpx;
+        background:rgba(255,255,255,1);
+        .doctor-content {
+          display: flex;
+          padding: 30rpx 0 32rpx;
+          border-bottom: 1rpx solid rgba(234,234,234,1);
+          .doctor-image {
+            width: 108rpx;
+            height: 108rpx;
+          }
+          .doctor-content-child {
+            padding-left: 19rpx;
+            height: 108rpx;
+            .doctor-content-name {
+              color: rgba(51,51,51,1);
+              font-size: 34rpx;
+            }
+            .doctor-content-title {
+              margin-left: 12rpx;
+              font-size: 24rpx;
+              color: rgba(51,51,51,1);
+            }
+            .doctor-content-position-container {
+              .doctor-content-position {
+                font-size: 24rpx;
+                color: rgba(153,153,153,1);
+              }
+            }
+            .doctor-content-specialize {
+              font-size: 24rpx;
+              color: rgba(153,153,153,1);
+              .doctor-content-label-image {
+                margin-right: 7rpx;
+                width: 17rpx;
+                height: 20rpx;
+              }
+            }
+          }
+        }
+        .btn-reserve-container {
+          display: flex;
+          justify-content: flex-end;
+          padding: 20rpx 0;
+          .btn-reserve {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 30rpx;
+            width: 150rpx;
+            height: 57rpx;
+            background: rgba(38,183,188,1);
+            border-radius: 29rpx;
+            font-size: 24rpx;
+            color: rgba(255,255,255,1);
+            line-height: 36rpx;
+          }
+          .unselect{
+            background:rgba(205,205,205,1);
+          }
+        }
+      }
+    }
+  }
+}
+</style>

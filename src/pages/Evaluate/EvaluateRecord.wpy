@@ -1,0 +1,163 @@
+<style lang="less">
+@import '../../styles/common.less';
+page{
+  background:#f5f5f5;
+}
+  .nothing{
+  margin-top:180rpx;
+  width:100%;
+  text-align:center;
+
+}
+.nothing image{
+  width:264rpx;
+  height:209rpx;
+  margin:0 auto;
+  margin-bottom:40rpx;
+}
+.nothing view{
+  color:#999;
+  font-size:28rpx;
+  text-align:center;
+}
+.nothing .start_btn{
+  width:628rpx;
+  height:90rpx;
+  text-align:center;
+  line-height:90rpx;
+  border-radius:45rpx;
+  color:#26B7BC;
+  font-size:32rpx;
+  border:1px solid #26B7BC;
+  margin:0 auto;
+  margin-top:96rpx;
+}
+.cells{
+  border-top:1px solid #eaeaea;
+}
+.cell{
+  height:180rpx;
+  padding:40rpx 30rpx; 
+  box-sizing:border-box;
+}
+.title{
+  font-size:30rpx;
+  line-height:36rpx;
+  width:100%;
+  padding-right:122rpx;
+  margin-bottom:17rpx;
+  max-height:74rpx;
+  overflow:hidden;
+  white-space:normal!important;
+  box-sizing:border-box;
+  display:-webkit-box;
+  word-break:break-all;
+  text-overflow:ellipsis;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+
+}
+.detail{
+  display:flex;
+  justify-content:space-between;
+  color:#999;
+  font-size:24rpx;
+  line-height:36rpx;
+}
+</style>
+<template>
+  <view class="container">
+      <view class="nothing" wx:if="{{list.length==0}}">
+        <image src='../../assets/images/msg_icon_class_nothing.png' ></image>
+        <view >您还没有任何评估记录</view>
+        <navigator url="/pages/Evaluate/EvaluateSheet" class="start_btn">立即开始评估</navigator> 
+      </view> 
+      <view class="cells" wx:else>
+        <navigator url='/pages/Evaluate/Result?id={{item.surveyInfo.id}}&AnswerId={{item.answerInfo.id}}' hover-class="none" class="cell" wx:for="{{list}}">
+            <view class="cell__bd">
+              <view class="title">{{item.surveyInfo.surveyName}}</view>
+              <view class='detail'>
+                  <view class="name">测评人：{{member.name}}</view>
+                  <view class="time">{{item.answerInfo.beginAnDate}}</view>
+              </view>
+            </view>       
+        </navigator>
+      </view> 
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showTost, showLoading } from '../../utils/common.js'
+  export default class Answer extends wepy.page {
+    config = {
+      navigationBarTitleText: '测评记录',
+      'navigationBarTextStyle': 'black',
+      'enablePullDownRefresh': true,
+      'backgroundTextStyle': 'dark'
+    }
+    components = {
+    }
+
+    data = {
+      list: [],
+      Isload: false,
+      member: {}
+    }
+
+    computed = {
+    }
+
+    methods = {
+      radioChange(e) {
+        console.log(e)
+      }
+    }
+
+    events = {
+    }
+    // 获取数据
+    getData () {
+      let that = this
+      let param = {
+        url: `/survey/score/getSurveyResultByUserId/${wepy.getStorageSync('memberId')}`,
+        method: 'GET',
+        data: {pageNo: 1, pageSize: 10}, //  '538af38ba5704bd8a56dd87de0aa1db8'
+        header: {
+          'content-type': 'application/x-www-form-urlencoded' // 默认值
+        }
+      }
+      that.Isload = false
+      wepy.request(param).then((data) => {
+        console.log(data)
+        that.list = data.resultData.list
+        that.member = data.resultData.memberInfo
+        that.Isload = true
+        setTimeout(function () {
+          wepy.hideNavigationBarLoading()
+          wepy.stopPullDownRefresh()
+        }, 500)
+        this.$apply()
+      }).catch((data) => {
+        showTost(data.resultDesc)
+        that.Isload = true
+        setTimeout(function () {
+          wepy.hideNavigationBarLoading()
+          wepy.stopPullDownRefresh()
+        }, 500)
+        this.$apply()
+      })
+    }
+        //  下拉刷新
+    onPullDownRefresh () {
+      if (this.Isload) {
+        wepy.showNavigationBarLoading()
+        this.getData()
+      }
+    }
+    onLoad() {
+      showLoading()
+      this.getData()
+    }
+  }
+</script>

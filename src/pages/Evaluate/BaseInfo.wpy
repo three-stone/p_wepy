@@ -1,0 +1,241 @@
+<style lang="less">
+  @import '../../styles/common.less';
+  page{
+    background:#F5F5F5;
+  }
+  .container{
+    padding-bottom:51rpx;
+  }
+  .cell{
+    padding:30rpx;
+    height:100rpx;
+    box-sizing:border-box;
+
+  }
+  .cell__bd view,.cell__ft{
+    font-size:28rpx;
+    color:#333333;
+  }
+.cell__bd .name{
+  height:72rpx;
+  margin-bottom:10rpx;
+  overflow:hidden;
+  white-space:normal!important;
+  box-sizing:border-box;
+  display:-webkit-box;
+  word-break:break-all;
+  text-overflow:ellipsis;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  }
+   .cell__bd .detail{
+    width:100%;
+    font-size:26rpx;
+    color:#666;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+   }
+
+  .cells{
+    margin-bottom:16rpx;
+  }
+  .cells .cell_tit{
+    height:64rpx;
+  }
+  .add{
+    width:36rpx;
+    height:36rpx;
+    color:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#26B7BC;
+    font-size:36rpx;
+    border-radius:50%;
+  }
+  .next_btn{
+    width:628rpx;
+    height:90rpx;
+    background:rgba(38,183,188,1);
+    border-radius:45rpx;
+    color:#fff;
+    font-size:32rpx;
+    text-align:center;
+    line-height:90rpx;
+    margin:0 auto;
+    margin-top:47rpx;
+  }
+ .selec .cell__ft{
+    color:#999999;
+  }
+ .selec .cell__l{
+    font-size:28rpx;
+    color:#333333;
+  }
+</style>
+<template>
+  <view class="container">
+      <view class="cells">
+          <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>测评人</view>
+              </view>
+              <view class="cell__ft">李家康</view>
+
+          </view>
+           <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>性别</view>
+              </view>
+              <view class="cell__ft ">男</view>
+          </view>
+          <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>出生日期</view>
+              </view>
+              <view class="cell__ft">2018-02-28</view>
+          </view>
+      </view>
+      <view class="cells selec">
+           <view class="cell" data-index='0' @tap="open">
+              <view class="cell__bd">
+                  <view>文化程度</view>
+              </view>
+              <view class="cell__ft">请填写</view>
+               <view class="cell__l" hidden>大学本科</view>
+          </view>
+          <view class="cell" data-index='1' @tap="open">
+              <view class="cell__bd">
+                  <view>职业</view>
+              </view>
+              <view class="cell__ft">农、林、牧、渔</view>
+              <view class="cell__l"></view>
+          </view>
+          <view class="cell" data-index='2' @tap="open">
+              <view class="cell__bd">
+                  <view>婚姻状况</view>
+              </view>
+              <view class="cell__ft">请填写</view>
+          </view>
+              <view class="cell" data-index='3' @tap="open">
+              <view class="cell__bd">
+                  <view>宗教信仰</view>
+              </view>
+              <view class="cell__ft">无</view>
+              <view class="cell__l"></view>
+          </view>
+      </view>
+      <view class="cells selec">
+           <view class="cell" data-index='4' @tap="open">
+              <view class="cell__bd">
+                  <view>吸烟史</view>
+              </view>
+              <view class="cell__ft ">10年，10支/天</view>
+               <view class="cell__l"></view>
+          </view>
+          <view class="cell" data-index='5' @tap="open">
+              <view class="cell__bd">
+                  <view>饮酒史</view>
+              </view>
+              <view class="cell__ft">8年，30ml/天</view>
+               <view class="cell__l"></view>
+          </view>
+          <view class="cell" data-index='5'>
+              <view class="cell__bd">
+                  <view>药物或接触过敏史</view>
+              </view>
+              <view class="cell__ft">请填写</view>
+               <view class="cell__l"></view>
+          </view>
+          <view class="cell" data-index='5'>
+              <view class="cell__bd">
+                  <view>既往病史（包括药物、酒精依赖史</view>
+              </view>
+              <view class="cell__ft">请填写</view>
+               <view class="cell__l"></view>
+          </view>
+      </view>
+      <view class='cells' >
+           <view class="cell" data-index='0' style="height:172rpx">
+              <view class="cell__bd">
+                  <view class="name">药物或接触过敏史</view>
+                  <view class="detail">青霉素就是过敏过敏过敏啊。。。。。。</view>
+              </view>
+          </view>
+          <view class="cell" data-index='0' style="height:172rpx">
+              <view class="cell__bd">
+                  <view class="name">既往病史（包括药物、酒精依赖史）</view>
+                  <view class="detail">青霉素就是过敏过敏过敏啊。。。。。。</view>
+              </view>
+          </view>
+      </view>
+      <view class="cells">
+          <view class="cell cell_tit" data-index='0'>
+              <view class="cell__bd">
+                  <view>用药记录</view>
+              </view>
+              <view class="cell__ft "><view class='add'>+</view></view>
+          </view>
+          <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>糖尿病</view>
+              </view>
+              <view class="cell__ft">2017-09-01确诊，未愈</view>
+          </view>
+           <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>高血压</view>
+              </view>
+              <view class="cell__ft ">2017-09-01确诊，未愈</view>
+          </view>
+      </view>
+      <view class="next_btn">下一步</view>
+      <repeat for="{{list}}" key="index" index="index" item="item" wx:if="{{index == SelectedIndex}}">
+        <picker1  :listData="item" ></picker1>
+      </repeat>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Select from '../../components/select'
+  export default class BaseInfo extends wepy.page {
+    config = {
+      navigationBarTitleText: '基本信息'
+    }
+
+    components = {
+      picker1: Select
+    }
+    data = {
+      list: [
+         {Name: ['李家康（自己）', '陈颖茵（夫妻）', '李远航（父母）']},
+         {Shop: ['广东省中医院慢病防治诊疗中心', '康美健康小屋广州天河城店（功能店）', '康美健康小屋广州海富花园店（社区店）']},
+         {Type: ['专家面诊', '中医推拿', '中医艾灸']},
+         {Doctor: ['不指定', '程兰（主任医师）', '张丹（健康顾问）']},
+         {Data: [' ', '今天', '1月23日（星期二）', '665']},
+         {Time: [' ', '10:00-11:00', '11:00-12:00']}
+      ],
+      SelectedIndex: '',
+      SelectedText: ''
+    }
+
+    computed = {
+    }
+
+    methods = {
+      open(e) {
+        this.SelectedIndex = e.currentTarget.dataset.index
+        this.$invoke('picker1', 'openPicker', '0')
+      }
+    }
+    events = {
+      'showchange': function (type) {
+        this.isOpen = type
+      }
+    }
+    onLoad() {
+    }
+  }
+</script>

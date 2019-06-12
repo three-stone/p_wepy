@@ -1,0 +1,150 @@
+<style lang="less">
+page{
+  padding:54rpx 30rpx 0 30rpx;
+   background:#F5F5F5;
+   width:100%;
+   box-sizing:border-box;
+}
+  .box1{
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    background:#fff;
+      view{
+        height: 68rpx;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        font-size: 30rpx;
+        color:#333;
+      }
+    .dateOn{
+      border-radius: 50%;
+      background-color: #26B7BC;
+      color: #fff;
+      display:flex;
+      flex-flow:column nowrap;
+    }
+    .dateBox{
+    width: 100%;
+    height: 60rpx;
+    line-height: 60rpx;
+    text-align: center;
+    font-size: 34rpx;
+    color:#fff;
+    background:#26B7BC;
+  }
+  }
+</style>
+<template>
+  <view class="container">
+      <view class='box1' style='width: {{ sysW  * 7 }}px'>
+        <view class='dateBox'>
+          {{ year }} 年 {{ month }} 月
+        </view>
+        <block wx:for='{{ weekArr }}' wx:key="*this">
+          <view style='width: {{ sysW }}px; height: {{ sysW }}px; line-height: {{ sysW }}px;'>{{ item }}</view>
+        </block>
+        <block wx:for='{{ arr }}' wx:key="*this">
+          <view style="{{ index == 0 ? 'margin-left:' + sysW * marLet + 'px;' : ' ' }}width: {{ sysW }}px; height: {{ sysW }}px;" class="{{ m1.search(getDate,item) != -1 ? 'dateOn' : ''}}">
+          {{ item }}<text style="font-size:24rpx;" wx:if="{{ m1.search(getDate,item) != -1 }}">出诊</text></view>
+        </block>
+      </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import { showTost, showLoading } from '../../utils/common.js'
+  import mywxs from '../../utils/common.wxs'
+  export default class Time extends wepy.page {
+    config = {
+      navigationBarTitleText: '线下服务排班'
+    }
+
+    components = {
+    }
+    data = {
+      id: '',
+      arr: [],
+      sysW: null,
+      marLet: null,
+      lastDay: null,
+      firstDay: null,
+      month: null,
+      getDate: null,
+      weekArr: ['日', '一', '二', '三', '四', '五', '六'],
+      year: null,
+      startDate: '',
+      endDate: ''
+    }
+    wxs = {
+      m1: mywxs
+    }
+    computed = {
+    }
+
+    methods = {
+    }
+    events = {
+    }
+    //  获取日历相关参数
+    dataTime (m) {
+      let date = new Date()
+      let year = date.getFullYear()
+      //  获取现今年份
+      this.year = year
+      //  获取今日日期
+     // this.getDate = date.getDate()
+      //  最后一天是几号
+      let d = new Date(year, m, 0)
+      this.lastDay = d.getDate()
+      //  第一天星期几
+      let firstDay = new Date(year, (m - 1), 1)
+      this.firstDay = firstDay.getDay()
+      let s = m > 9 ? m : '0' + m
+      this.startDate = year + '-' + s + '-' + '01'
+      this.endDate = year + '-' + s + '-' + d.getDate()
+    }
+    getData() {
+      let that = this
+      let param = {
+        url: 'his/scheduling/schedulingList',
+        method: 'post',
+        data: {drId: this.id, pageNo: 1, pageSize: 20, type: 1, startDate: this.startDate, endDate: this.endDate},
+        header: {
+          'content-type': 'application/x-www-form-urlencoded' // 默认值
+        }
+      }
+      showLoading()
+      wepy.request(param).then((data) => {
+        console.log(data)
+        let arry = []
+        if (data.content !== null) {
+          data.content.list.forEach((item) => {
+            arry.push(Number(item.date.split('-')[2]))
+          })
+          that.getDate = arry
+          this.$apply()
+        }
+        console.log(that.getDate)
+      }).catch((data) => {
+        showTost(data.resultDesc)
+      })
+    }
+    onLoad(e) {
+      let arry = []
+      let date = new Date()
+      this.month = date.getMonth() + 1
+      this.dataTime(this.month)
+      this.id = e.id
+      for (let i = 1; i < this.lastDay + 1; i++) {
+        arry.push(i)
+      }
+      this.arr = arry
+      let res = wepy.getSystemInfoSync()
+      this.sysW = res.windowHeight / 12 //  更具屏幕宽度变化自动设置宽度
+      this.marLet = this.firstDay
+      this.getData()
+    }
+  }
+</script>

@@ -1,0 +1,238 @@
+<style lang="less">
+  @import '../../styles/common.less';
+  page{
+    background:#fff;
+  }
+  .cell{
+    padding:50rpx 60rpx 30rpx 60rpx;
+    height:120rpx;
+    box-sizing:border-box;
+
+  }
+  .cell__bd view,.cell__ft{
+    font-size:28rpx;
+    color:#333333;
+  }
+  .cell:before {
+    left:60rpx;
+    right:60rpx;
+  }
+  .cell_b:after{
+    content: " ";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 1px;
+    border-top: 4rpx solid #EAEAEA;
+    color: #e5e5e5;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+    left:60rpx;
+    right:60rpx;
+    z-index: 2;
+  }
+  .sub_btn{
+    width:628rpx;
+    height:90rpx;
+    background:rgba(38,183,188,1);
+    border-radius:45rpx;
+    color:#fff;
+    font-size:32rpx;
+    text-align:center;
+    line-height:90rpx;
+    margin:0 auto;
+    margin-top:160rpx;
+  }
+  .disabled{
+    opacity:0.5;
+  }
+  .pld{
+    font-size:28rpx;
+    color:rgba(205,205,205,1);
+  }
+  .head{
+    height:291rpx;
+    width:100%;
+    background:url(https://rs02.kanghehealth.com/wx/image/login_bg_01.png) 0 0 no-repeat;
+    background-size:100% 291rpx;
+    color:#fff;
+    font-size:48rpx;
+    padding-top:139rpx;
+    box-sizing:border-box;
+    padding-left:59rpx;
+    margin-bottom:16rpx;
+  }
+  .link{
+    display:flex;
+    width:628rpx;
+    padding:20rpx;
+    margin:0 auto;
+    box-sizing:border-box;
+    justify-content:space-between;
+        navigator{
+          color:#26B7BC;
+          font-size:26rpx;
+        }
+  }
+  .footer{
+    position: fixed;
+    width:500rpx;
+    left:125rpx;
+    bottom:38rpx;
+    font-size:24rpx;
+    color:#333333;
+    display:flex;
+      navigator{
+          color:#26B7BC;
+          font-size:22rpx;
+      }
+  }
+  .admin{
+    background:#fff;
+    margin-top:69rpx;
+    border:1px solid #3CB2B9;
+    color:#26B7BC;
+  }
+  .code{
+    padding-left:20rpx;
+    border-left:1px solid #eaeaea;
+    color:#999;
+    width:140rpx;
+    font-size:28rpx;
+    text-align:center;
+    color:#26B7BC;
+  }
+</style>
+<template>
+  <view class="container">
+      <view class="head">
+        注册账号
+      </view>
+      <view class="cells">
+           <view class="cell">
+              <view class="cell__bd">
+                 <input type="text" placeholder="输入一个手机号" value="{{mobile}}" @input="inputchange" placeholder-class="pld"></input>
+              </view>
+          </view>
+          <view class="cell cell_b">
+              <view class="cell__bd">
+                  <input type="text" placeholder="填写验证码" value="{{codeval}}" @input='codechange' placeholder-class="pld"></input>
+              </view>
+              <view class="cell__ft">
+                <view class='code' @tap="getcode">{{code}}</view>
+              </view>
+          </view>
+      </view>
+      <view class="sub_btn {{mobile.length ==0 ? 'disabled' : '' }}"  @tap="{{mobile.length !==0 ? 'next' : '' }}">下一步</view>
+      <navigator url='/pages/LoginRegister/Login' open-type='navigateBack' hover-class='none' class="sub_btn admin">登录</navigator>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showTost } from '../../utils/common.js'
+  export default class Register extends wepy.page {
+    config = {
+      navigationBarTitleText: ' '
+    }
+
+    components = {
+    }
+    data = {
+      code: '获取验证码',
+      codenum: 60,
+      codeval: '',
+      mobile: '',
+      codeAuthToken: '',
+      IsgetCode: true,
+      time: ''
+    }
+
+    computed = {
+    }
+
+    methods = {
+      inputchange (e) {
+        this.mobile = e.detail.value
+      },
+      codechange (e) {
+        this.codeval = e.detail.value
+      },
+      getcode () {
+        if (this.IsgetCode) {
+          if (this.mobile === '') {
+            showTost('手机号不能为空')
+            return
+          }
+          if (!(/^1[3|4|5|7|8]\d{9}$/.test(this.mobile))) {
+            showTost('手机号不正确')
+            return
+          }
+          let that = this
+          let num = that.codenum
+          that.IsgetCode = false
+          that.code = '60s'
+          let param = {
+            url: '/userController/sendCode',
+            method: 'get',
+            data: {phone: this.mobile, type: 0},
+            header: {
+              'content-type': 'application/x-www-form-urlencoded' // 默认值
+            }
+          }
+          wepy.request(param).then((res) => {
+            that.codeAuthToken = res.resultData.codeAuthToken
+            const Timer = setInterval(() => {
+              if (that.codenum > 0) {
+                num--
+                that.code = num + 's'
+                that.codenum = num
+              } else {
+                that.code = '获取验证码'
+                that.codenum = 60
+                that.IsgetCode = true
+                clearInterval(Timer)
+              }
+              that.time = Timer
+              this.$apply()
+            }, 1000)
+          }).catch((res) => {
+            showTost(res.resultDesc)
+          })
+        }
+      },
+      next () {
+        let that = this
+        if (this.codeval.lenth !== 0) {
+          let param = {
+            url: '/userController/checkVerifyCode',
+            method: 'get',
+            data: {code: that.codeval, codeAuthToken: that.codeAuthToken, phone: that.mobile},
+            header: {
+              'content-type': 'application/x-www-form-urlencoded' // 默认值
+            }
+          }
+          wepy.request(param).then((res) => {
+            console.log(res.result)
+            wepy.navigateTo({
+              url: '/pages/LoginRegister/SetPassword?code=' + that.codeval + '&codeAuthToken=' + that.codeAuthToken + '&phone=' + that.mobile
+            })
+          }).catch((res) => {
+            showTost(res.resultDesc)
+          })
+        }
+      }
+    }
+    events = {
+    }
+    onUnload() {
+      let that = this
+      clearInterval(that.time)
+    }
+    onLoad() {
+    }
+  }
+</script>

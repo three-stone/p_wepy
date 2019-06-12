@@ -1,0 +1,96 @@
+<style lang="less">
+  @import '../../styles/common.less';
+page{
+  background:#F5F5F5;
+}
+.cells{
+  margin-bottom:16rpx;
+}
+.cell{
+  color:#333;
+  font-size:28rpx;
+}
+.address_desc{
+  padding:40rpx 30rpx 20rpx 30rpx;
+  color:#999;
+  width:100%;
+  box-sizing:border-box;
+  font-size:24rpx;
+}
+
+.cell radio{
+  transform:scale(0.8);
+}
+.disabled view{
+  color:#999;
+}
+.price{
+  font-size:42rpx;
+}
+ .sub_btn{
+    width:628rpx;
+    height:90rpx;
+    background:rgba(38,183,188,1);
+    border-radius:45rpx;
+    color:#fff;
+    font-size:32rpx;
+    text-align:center;
+    line-height:90rpx;
+    margin:0 auto;
+    margin-top:83rpx;
+  }
+</style>
+<template>
+  <view class="container">
+      <view class="address_desc">选择第三方支付</view>
+      <view class="cells">
+        <view class="cell">
+            <view class="cell__bd">
+                <view>需支付:<text class="price">￥132</text></view>
+            </view>
+        </view>
+      </view> 
+        <view class="cells">
+            <view class="cell">
+                <div class="cell__hd">
+                 <imgae></imgae>
+                </div>
+                <view class="cell__bd">
+                    <view>微信支付</view>
+                </view>
+                <view class="cell__ft">
+                   <radio value="{{item.value}}" color="#26B7BC" size="22" checked="{{item.checked}}"/>
+                </view>
+            </view>
+        </view> 
+      <view class="sub_btn">确认支付</view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class PayConfirm extends wepy.page {
+    config = {
+      navigationBarTitleText: '选择第三方支付'
+    }
+
+    components = {
+    }
+    data = {
+    }
+
+    computed = {
+    }
+
+    methods = {
+      click(e) {
+        this.idx = e.currentTarget.dataset.index
+      }
+    }
+
+    onLoad() {
+
+    }
+  }
+</script>

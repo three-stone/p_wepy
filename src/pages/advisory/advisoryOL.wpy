@@ -1,0 +1,632 @@
+<template>
+  <view>
+    <scroll-view class='chat' id="chat" style="height:{{height}}px;" scroll-y style='padding-bottom:49px;' >
+      <block wx:for="{{currentMsgsArray}}" wx:key="*this">
+        <view class='chat-time'>{{item.msgTime}}</view>
+        <view class="chat-item {{item.isSelfSend ? 'flex' : ''}}" wx:if="{{item.userAction !== 2&&item.userAction !== 1}}">
+            <view class='avatar'>
+              <image style="width:40px;height:40px;border-radius:50%;" mode= "scaleToFill" src="{{item.avatarUrl == ''?'https://rs02.kanghehealth.com/wx/image/default_portrait.png':item.avatarUrl}}"></image>
+            </view>
+            <view class='content' wx:if="{{item.imgurl.length!== 0&& item.imgurl!=''}}"><image class='img' src='{{item.imgurl}}'></image></view>
+            <view class='content qipao' wx:else>{{item.msgContent}}</view>
+        </view>
+
+        <view class="chat-item {{item.isSelfSend ? 'flex' : ''}}" wx:if="{{item.userAction == 2}}">
+            <view class='avatar'>
+              <image style="width:40px;height:40px;border-radius:50%;" mode= "scaleToFill" src="{{item.avatarUrl == ''?'https://rs02.kanghehealth.com/wx/image/default_portrait.png':item.avatarUrl}}"></image>
+            </view>
+            <view class='content bgfff'>
+              <view class='title'>{{item.title}}</view>
+              <view class='desc'>{{item.des}}</view>
+              <view class='btn' @tap="anser({{item.surverId}})">开始测评</view>
+            </view>
+        </view>
+      </block>
+    </scroll-view>
+    <view class='footer-h'></view>
+    <view class='chat-footer' wx:if="{{!currentMsgsArray[currentMsgsArray.length-1].isSelfSend}}">
+       <view class='flex-item ' bindtap='send1'> <text class="iconfont icon-yuyin" style='vertical-align: 0;padding-right:0; '></text></view>
+       <view class='flex-item5'>
+          <input class='input'  @input="input" value="{{msgContent}}" @confirm='bindconfirm' placeholder="对ta发送消息"/>
+       </view>
+       <view class='flex-item2 send' @tap='send'>发送</view>
+    </view>
+    <view class='chat-footer wrait' wx:else>
+      您的咨询内容已提交，等待医生回复
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import { showTost } from '../../utils/common'
+  import webim from '../../utils/webim.js'
+  export default class templates extends wepy.page {
+    config = {
+      'backgroundTextStyle': 'light',
+      'navigationBarBackgroundColor': '#ffffff',
+      'navigationBarTitleText': '在线咨询',
+      'navigationBarTextStyle': 'black'
+    }
+
+    components = {
+    }
+
+    data = {
+      selToID: '',
+      msgContent: '',
+      msgs: [],
+      currentMsgsArray: [],
+      selType: webim.SESSION_TYPE.C2C,
+      docotorimg: '',
+      Identifier: '',
+      UserSig: '',
+      imgurl: {}
+    }
+
+    methods = {
+      input (e) {
+        this.msgContent = e.detail.value
+      },
+      send() {
+        this.sendMsg()
+      },
+      anser (num) {
+        this.$navigate('/pages/Evaluate/AssessmentIndex?id=' + num)
+      }
+    }
+
+    events = {
+    }
+    login () {
+      let that = this
+      let loginInfo = {
+        'sdkAppID': 1400139758,   // 测试   1400133836
+        'appIDAt3rd': 1400139758,
+        'identifier': this.Identifier,
+        'identifierNick': wepy.getStorageSync('memberInfo').name,
+        'accountType': 38919, // 测试   37261
+        'selType': webim.SESSION_TYPE.C2C,
+        'userSig': this.UserSig
+      }
+      //  监听连接状态回调变化事件
+      let onConnNotify = function (resp) {
+        let info
+        switch (resp.ErrorCode) { // 链接状态码
+          case webim.CONNECTION_STATUS.ON:
+            webim.Log.warn('建立连接成功: ' + resp.ErrorInfo)
+            break
+          case webim.CONNECTION_STATUS.OFF:
+            info = '连接已断开，无法收到新消息，请检查下您的网络是否正常: ' + resp.ErrorInfo
+            webim.Log.warn(info)
+            break
+          case webim.CONNECTION_STATUS.RECONNECT:
+            info = '连接状态恢复正常: ' + resp.ErrorInfo
+            webim.Log.warn(info)
+            break
+          default:
+            webim.Log.error('未知连接状态: =' + resp.ErrorInfo) // 错误信息
+            break
+        }
+      }
+      let options = {
+        'isAccessFormalEnv': true,  //  是否访问正式环境，默认访问正式，选填
+        'isLogOn': false  //  是否开启控制台打印日志,默认开启，选填
+      }
+    //  监听新消息事件     注：其中参数 newMsgList 为 webim.Msg 数组，即 [webim.Msg]。
+      let selSess = null
+      function onMsgNotify(newMsgList) {
+        let sess
+        let newMsg
+        // 获取所有聊天会话
+        let sessMap = webim.MsgStore.sessMap()
+        for (let j in newMsgList) { //  遍历新消息
+          newMsg = newMsgList[j]
+         // console.log(newMsg.getSession().id())
+          console.log(that.selToID)
+          if (newMsg.getSession().id() === that.selToID) {  // 为当前聊天对象的消息
+            selSess = newMsg.getSession()
+            // 在聊天窗体中新增一条消息
+            // console.warn(newMsg)
+            that.addMsg(newMsg)
+          }
+        }
+        //  消息已读上报，以及设置会话自动已读标记
+        webim.setAutoRead(selSess, true, true)
+        for (let i in sessMap) {
+          sess = sessMap[i]
+          if (that.selToID !== sess.id()) { //  更新其他聊天对象的未读消息数
+            webim.updateSessDiv(sess.type(), sess.id(), sess.unread())
+          }
+        }
+      }
+      //  事件回调对象 监听事件
+      let listeners = {
+        'onConnNotify': onConnNotify, //  监听连接状态回调变化事件,必填
+        'onMsgNotify': onMsgNotify  //  监听新消息(私聊，普通群(非直播聊天室)消息，全员推送消息)事件，必填
+      }
+      //  1v1单聊的话，一般只需要 'onConnNotify' 和 'onMsgNotify'就行了。
+      webim.login(loginInfo, listeners, options, function (resp) {
+        loginInfo.identifierNick = resp.identifierNick // 设置当前用户昵称
+        that.getPic()
+        that.hisMsg()
+        console.log('登录成功')
+      }, function (err) {
+        console.log('登录失败------------------', err.ErrorInfo)
+        showTost('登录失败')
+      })
+    }
+    hisMsg () {
+      let that = this
+      let options = {
+        'Peer_Account': this.selToID, // 指定的好友帐号
+        'MaxCnt': 10, // 拉取的消息数目
+        'LastMsgTime': 0, // 上一次拉取的时间  在第一次拉去消息的时候，这里必须为0
+        'MsgKey': ''
+      }
+      let selSess = null
+      webim.getC2CHistoryMsgs(
+        options,
+        function (resp) {
+          console.log(resp)
+        //  let complete = resp.Complete // 是否还有历史消息可以拉取，1-表示没有，0-表示有
+          if (resp.MsgList.length === 0) {
+            return
+          }
+          //  拉取消息后，要将下一次拉取信息所需要的东西给存在缓存中
+          wepy.setStorageSync('lastMsgTime', resp.LastMsgTime)
+          wepy.setStorageSync('msgKey', resp.MsgKey)
+          let msgList = resp.MsgList
+          for (let j in msgList) { // 遍历新消息
+            let msg = msgList[j]
+            if (msg.getSession().id() === that.selToID) { // 为当前聊天对象的消息
+              selSess = msg.getSession()
+              // 在聊天窗体中新增一条消息
+              that.addMsg(msg)
+             // console.log(msg)
+            }
+          }
+
+          // 发送申请的内容
+          if (that.msgContent.length !== 0) {
+            that.sendMsg()
+            console.log(1)
+          }
+          if (JSON.stringify(that.imgurl) !== '{}') {
+            that.sendCustomMsg(that.imgurl)
+            that.imgurl = {}
+            console.log(123)
+          }
+          //  消息已读上报，并将当前会话的消息设置成自动已读
+          webim.setAutoRead(selSess, true, true)
+        },
+      )
+    }
+    addMsg (msg) {
+      let that = this
+      let fromAccount
+      let fromAccountNick
+      let sessType
+      let subType
+      fromAccount = msg.getFromAccount()
+      if (!fromAccount) {
+        fromAccount = ''
+      }
+      fromAccountNick = msg.getFromAccountNick()
+      if (!fromAccountNick) {
+        fromAccountNick = fromAccount
+      }
+      //  解析消息
+      //  获取会话类型
+      //  webim.SESSION_TYPE.GROUP-群聊，
+      //  webim.SESSION_TYPE.C2C-私聊，
+      sessType = msg.getSession().type()
+      //  获取消息子类型
+      //  会话类型为群聊时，子类型为：webim.GROUP_MSG_SUB_TYPE
+      //  会话类型为私聊时，子类型为：webim.C2C_MSG_SUB_TYPE
+      subType = msg.getSubType()
+      switch (sessType) {
+        case webim.SESSION_TYPE.C2C: // 私聊消息
+          switch (subType) {
+            case webim.C2C_MSG_SUB_TYPE.COMMON: //  c2c普通消息
+              //  业务可以根据发送者帐号fromAccount是否为app管理员帐号，来判断c2c消息是否为全员推送消息，还是普通好友消息
+              //  或者业务在发送全员推送消息时，发送自定义类型(webim.MSG_ELEMENT_TYPE.CUSTOM,即TIMCustomElem)的消息，在里面增加一个字段来标识消息是否为推送消息
+              that.convertMsg(msg)  //  解析方法
+             // console.log(msg)
+              break
+          }
+          break
+      }
+    }
+    convertMsg (msg) {
+      let that = this
+      let elems
+      let elem
+      let type
+      let content
+      let isSelfSend
+    //  let loginInfo = that.loginInfo  //  自己的资料
+     // let friendInfo = that.friendInfo // 对方的资料，这里要特别注意一下，消息里面是不会返回双方的头像和昵称的，只能通过指定的方法得到。
+      elems = msg.getElems()
+      isSelfSend = msg.getIsSend() // 消息是否为自己发的 true是自己发送，
+      let sess = msg.sess
+      let currentMsg = {} //  设置消息数组，存消息
+      let currentMsgsArray = that.currentMsgsArray
+      for (let i in elems) {
+        elem = elems[i]
+        type = elem.getType()
+        content = elem.getContent()
+        let msgTime = msg.getTime() //  得到当前消息发送的时间
+        //  得到当天凌晨的时间戳
+        let timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000
+        let thisdate
+        let d = new Date(msgTime * 1000) // 根据时间戳生成的时间对象
+        let min = d.getMinutes()
+        let hour = d.getHours()
+        //  得到时和分，分小于10时，只返回一位数
+        if (min < 10) {
+          min = '0' + min
+        }
+        //  得到月份和天  月份一般是从0开始，所以展示出来要+1
+        let month = d.getMonth()
+        let day = d.getDate()
+        //  得到时间   当天时间应该只显示时分  当天以前显示日期+时间
+        if (timeStamp > msgTime) {
+          thisdate = ((month + 1) + '-' + day + ' ' + hour + ':' + min)
+        } else {
+          thisdate = (hour + ':' + min)
+        }
+        switch (type) {
+          case webim.MSG_ELEMENT_TYPE.TEXT:
+            let msgContent = content.getText()
+            currentMsg.msgContent = msgContent  //  当前消息的内容
+            currentMsg.imgurl = ''
+            currentMsg.msgTime = thisdate
+            currentMsg.isSelfSend = isSelfSend
+            //  根据是否自己发送的消息，设置双方的头像
+            if (isSelfSend) {
+              currentMsg.avatarUrl = ''
+            } else {
+              currentMsg.avatarUrl = that.docotorimg
+            }
+            //  然后将每一条聊天消息push进数组
+            currentMsgsArray.push(currentMsg)
+            that.currentMsgsArray = currentMsgsArray
+            that.$apply()
+         //   console.log(currentMsgsArray)
+            break
+          case webim.MSG_ELEMENT_TYPE.CUSTOM: // 自定义消息
+            let msgobj = that.convertCustomMsgToHtml(content)
+            console.log(msgobj.data)
+            if (msgobj.data.length === '') {
+            } else {
+              msgobj = JSON.parse(msgobj.data)
+            }
+            if (msgobj.userAction === 2) {
+              currentMsg.title = msgobj.title  //  当前消息的内容
+              currentMsg.des = msgobj.des
+              currentMsg.userAction = msgobj.userAction
+              currentMsg.surverId = msgobj.surveyId
+              currentMsg.msgTime = thisdate
+              currentMsg.isSelfSend = isSelfSend
+              if (isSelfSend) {
+                currentMsg.avatarUrl = ''
+              } else {
+                currentMsg.avatarUrl = that.docotorimg
+              }
+              //  然后将每一条聊天消息push进数组
+              currentMsgsArray.push(currentMsg)
+              that.currentMsgsArray = currentMsgsArray
+              that.$apply()
+            }
+            if (msgobj.isPic === 1) {
+              currentMsg.imgurl = msgobj.pic
+              currentMsg.msgTime = thisdate
+              currentMsg.isSelfSend = isSelfSend
+              if (isSelfSend) {
+                currentMsg.avatarUrl = ''
+              } else {
+                currentMsg.avatarUrl = that.docotorimg
+              }
+              currentMsgsArray.push(currentMsg)
+              that.currentMsgsArray = currentMsgsArray
+              that.$apply()
+            }
+
+            break
+        }
+      }
+      this.pageScrollToBottom()
+    }
+    // 解析自定义消息
+    convertCustomMsgToHtml(content) {
+      let data = content.getData()
+      let desc = content.getDesc()
+      let ext = content.getExt()
+      let mscontent = {
+        data: data,
+        desc: desc,
+        ext: ext
+      }
+      return mscontent
+    }
+    getPic () {
+      let that = this
+      let taglist = []
+      taglist.push('Tag_Profile_IM_Nick')
+      taglist.push('Tag_Profile_IM_Image')
+      let options = {}
+      let account = []
+      let userId = this.selToID
+      account.push(userId)
+      options.To_Account = account
+      options.TagList = taglist
+      webim.getProfilePortrait(
+        options,
+        function (res) {
+          //  这里面的数据就是用户的资料了，当然是获得的你所写了的资料
+          let UserProfileItem = res.UserProfileItem
+          let C2cNick
+          let C2cImage
+          for (let i = 0; i < UserProfileItem.length; i++) {
+            let data = UserProfileItem[i].ProfileItem
+            C2cNick = data[0].Value
+            C2cImage = data[1].Value
+          }
+          that.docotorimg = C2cImage
+          wepy.setNavigationBarTitle({
+            title: C2cNick
+          })
+        }, function (error) {
+          console.log(error)
+          if (error.ErrorCode === 40003) {
+            showTost('医生账户不存在')
+          }
+        }
+      )
+    }
+    sendMsg () {
+      if (this.msgContent !== '') {
+        let that = this
+        let isSend = true //  是否为自己发送
+        let seq = -1 // 消息序列，-1表示 SDK 自动生成，用于去重
+        let random = Math.round(Math.random() * 4294967296)   //  消息随机数，用于去重
+        let msgTime = Math.round(new Date().getTime() / 1000) //  消息时间戳
+        let subType //  消息子类型
+        let identifier = that.Identifier
+        let selSess = new webim.Session(that.selType, that.selToID)
+        if (subType === webim.SESSION_TYPE.C2C) {
+          subType = webim.C2C_MSG_SUB_TYPE.COMMON
+        }
+        let msg = new webim.Msg(selSess, isSend, seq, random, msgTime, identifier, subType)
+        let textobj
+        let expr = /\[[^[\]]{1,3}\]/mg
+        let emotions = this.msgContent.match(expr)
+        if (!emotions) {
+          textobj = new webim.Msg.Elem.Text(this.msgContent)
+          msg.addText(textobj)
+        }
+        webim.sendMsg(msg, function (resp) {
+          if (that.selType === webim.SESSION_TYPE.C2C) {
+            that.addMsg(msg)  //  这个方法上面有
+            that.msgContent = ''
+            that.$apply()
+          }
+        }, function (err) {
+          console.log(err.ErrorInfo)
+        })
+      }
+    }
+    // 发送消息(自定义消息)
+    sendCustomMsg(msgs, callback) {
+      let that = this
+      let data = JSON.stringify(msgs.Data) //  数据
+      let desc = msgs.Desc //  描述
+      let ext = msgs.Ext  //  拓展字段
+      let msgLen = webim.Tool.getStrBytes(data)
+      if (msgs.length < 1) {
+        return
+      }
+      let maxLen
+      let errInfo
+      if (that.selType === webim.SESSION_TYPE.C2C) {
+        maxLen = webim.MSG_MAX_LENGTH.C2C
+        errInfo = '消息长度超出限制(最多' + Math.round(maxLen / 3) + '汉字)'
+      } else {
+        maxLen = webim.MSG_MAX_LENGTH.GROUP
+        errInfo = '消息长度超出限制(最多' + Math.round(maxLen / 3) + '汉字)'
+      }
+      if (msgLen > maxLen) {
+        alert(errInfo)
+        return
+      }
+      let selSess = new webim.Session(that.selType, that.selToID, Math.round(new Date().getTime() / 1000))
+      let msg = new webim.Msg(selSess, true, -1, -1, -1, that.Identifier, 0, that.identifierNick)
+      let customobj = new webim.Msg.Elem.Custom(data, desc, ext)
+      msg.addCustom(customobj)
+      msg.sending = 1
+      // //调用发送消息接口
+      webim.sendMsg(msg, function (resp) {
+        if (that.selType === webim.SESSION_TYPE.C2C) {
+          // 处理消息
+          that.addMsg(msg)
+        }
+        // that.msginformagent(id, msgs)
+        webim.Log.info('发消息成功')
+      }, function (err) {
+        webim.Log.info('发消息失败')
+      })
+    }
+    // 滚动最底部
+    pageScrollToBottom () {
+      wx.createSelectorQuery().select('#chat').boundingClientRect(function (rect) {
+        // 使页面滚动到底部
+        wx.pageScrollTo({
+          scrollTop: rect.bottom
+        })
+      }).exec()
+    }
+    onLoad (option) {
+      this.selToID = option.id // 'ACC00389786363'
+      this.UserSig = wepy.getStorageSync('memberInfo').imUserSign
+      this.Identifier = wepy.getStorageSync('memberId')
+      if (option.text.length !== 0) {
+        this.msgContent = option.text
+      }
+      if (option.imgurl.length !== 0) {
+        this.imgurl = {Data: {pic: option.imgurl, isPic: 1}, Desc: '', Ext: ''}
+      }
+      if (webim.checkLogin()) {
+        this.getPic()
+        this.hisMsg()
+      } else {
+        this.login()
+      }
+    }
+    onUnload () {
+      this.imgurl = {}
+    }
+    // onShow () {
+    //   if (webim.checkLogin()) {
+    //     this.getPic()
+    //     this.hisMsg()
+    //   } else {
+    //     this.login()
+    //   }
+    // }
+  }
+</script>
+<style lang="less">
+@import '../../styles/common.less';
+.flex-wrap.s ,.house{
+  flex-direction:row-reverse;
+
+}
+page{
+  background:#f5f5f5;
+}
+.flex{
+  display:flex;
+  flex-flow:row-reverse nowrap;
+  .content{
+    margin:0;
+    margin-right:10rpx;
+    background:#26B7BC;
+    color:#fff;
+  }
+}
+.h49{
+  width: 100%;
+  height: 49px;
+}
+.chat-item{
+  line-height: 20rpx;
+  height: auto;
+  padding: 40rpx 20rpx;
+  width:100%;
+  box-sizing:border-box;
+  display:flex;
+}
+.chat-footer{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height:80rpx;
+  background: #ffffff;
+}
+.img{
+  width:214rpx;
+  height:284rpx;
+}
+.send{
+  width: 20%;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  background: #69BEFF;
+  color: #ffffff;
+  font-size: 16px;
+}
+.input{
+  height: 80rpx;
+  line-height:80rpx;
+  padding-left:20rpx;
+  font-size: 28rpx;
+}
+.avatar{
+  width: 80rpx;
+  height: 80rpx;
+  border-radius:50%;
+  text-align: center;
+  line-height: 40rpx;
+  color: #ffffff;
+}
+.content{
+  background: #ffffff;
+  margin-left: 10px;
+  padding:12px;
+  border-radius:10px; 
+  width: auto;
+  max-width: 480rpx;
+  font-size: 30rpx;
+  text-align: justify;
+  word-break:break-all;
+  line-height:40rpx;
+}
+
+.chat-time{
+  width: 80px;
+  height: 21px;
+  line-height: 21px;
+  background: #CECECE;
+  color: #ffffff;
+  font-size: 12px;
+  margin: 20px auto 0px;
+  text-align: center;
+  border-radius:5px;
+
+}
+.chat-footer{
+  display:flex;
+}
+.flex-item5{
+  width:80%;
+}
+.wrait{
+  background:#26B7BC;
+  color:#fff;
+  font-size:28rpx;
+  text-align:center;
+  line-height:80rpx;
+  display:flex;
+  justify-content:center;
+}
+.btn{
+  height:80rpx;
+  background:#26B7BC;
+  color:#fff;
+  text-align:center;
+  line-height:80rpx;
+  width:300rpx;
+  margin:0 auto;
+  border-radius:40px
+}
+.title{
+  font-size:36rpx;
+  color:#333;
+  width:100%;
+  text-align:center;
+  margin-bottom:16rpx;
+}
+.desc{
+  color:#999;
+  font-size:26rpx;
+  width:100%;
+  height:48rpx;
+  overflow:hidden;
+  margin-bottom:20rpx;
+}
+.flex .bgfff{
+  background:#fff;
+}
+</style>

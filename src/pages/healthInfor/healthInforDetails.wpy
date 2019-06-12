@@ -1,0 +1,234 @@
+<template>
+  <view class="view-container" wx:if="{{information !== null && information !== ''}}">
+    <text class="title">{{information.title}}</text>
+    <view class="label">
+      <text>{{information.author}}</text>
+      <text>{{information.createDate}}</text>
+    </view>
+    <image class="health-details-img" src="{{information.mainPicture}}" wx:if="{{information.mainPicture}}"></image>
+    <view class="img-exp">{{information.introduction}}</view>
+    <view class="health-detail-content">
+      <import src="../../utils/wxParse.wxml"/>
+      <template is="wxParse" data="{{wxParseData:article.nodes}}"/>
+    </view>
+    <view class="text-label">
+      <view class="text-label-child" wx:for="{{information.labelIds}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+        {{item}}
+      </view>
+    </view>
+  </view>
+  <view class="doYouWant">你可能还想看</view>
+  <view class="more-container">
+    <view class="more-child" wx:for="{{moreList}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+      <image class="more-img" mode="aspectFit" src="{{item.thumbnail}}" @tap="tap({{item.id}})"></image>
+      <view class='more-content'>
+        <text class="more-content-title" @tap="tap({{item.id}})">{{item.title}}</text>
+        <view class="more-content-label-container">
+          <text class='desc'></text>
+          <view>
+              <text>{{item.newsCollect ==null || item.newsCollect == ''? 0 : item.newsCollect}} 收藏</text>
+              <text style="margin-left:30rpx;">{{item.newsReading ==null || item.newsReading == ''? 0 :item.newsReading}} 阅读</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view></view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showTost, showLoading } from '../../utils/common'
+  import WxParse from '../../utils/wxParse.js'
+  export default class templates extends wepy.page {
+    config = {
+      'navigationBarTitleText': ''
+    }
+
+    components = {
+    }
+
+    data = {
+      healthDetailLabel: [
+        { labelContent: '进补' },
+        { labelContent: '中医体质' },
+        { labelContent: '红色食物' }
+      ],
+      moreList: [],
+      title: '',
+      author: 'ee',
+      infortime: '2017-01-01',
+      mainPicture: '',
+      introduction: '',
+      text: '',
+      information: '',
+      informationList: []
+    }
+
+    methods = {
+      tap (informationId) {
+        this.$redirect('./healthInforDetails?informationId=' + informationId)
+      }
+    }
+
+    events = {
+    }
+
+    getData(informationId) {
+      let that = this
+      let param = {
+        url: '/info/forApp/' + informationId,
+        method: 'get',
+        data: {},
+        header: {
+          'content-type': 'application/x-www-form-urlencoded' // 默认值
+        }
+      }
+      showLoading()
+      wepy.request(param).then((data) => {
+        that.moreList = data.content.informationList
+        that.information = data.content.information
+        /**
+             * WxParse.wxParse(bindName , type, data, target,imagePadding)
+             * 1.bindName绑定的数据名(必填)
+             * 2.type可以为html或者md(必填)
+             * 3.data为传入的具体数据(必填)
+             * 4.target为Page对象,一般为this(必填)
+             * 5.imagePadding为当图片自适应是左右的单一padding(默认为0,可选)
+             */
+        if (data.content.information !== null && data.content.information !== '') {
+          let article = that.information.text
+          WxParse.wxParse('article', 'html', article, that, 0)
+        }
+        that.$apply()
+      }).catch((data) => {
+        console.log(data)
+        showTost(data.resultDesc)
+      })
+    }
+
+    onLoad (option) {
+      this.getData(option.informationId)
+      this.$apply()
+    }
+  }
+</script>
+<style lang="less">
+@import '../../styles/common.less';
+@import '../../utils/wxParse.wxss';
+@30-padding: 50rpx;
+@full-width: 100%;
+.view-container {
+  padding: 38rpx 30rpx 66rpx;
+  background: rgba(255,255,255,1);
+  .title {
+    font-size: 48rpx;
+    color: rgba(51,51,51,1);
+    line-height: 72rpx;
+  }
+  .label {
+    padding: 43rpx 0;
+    font-size: 28rpx;
+    color: rgba(51,51,51,1);
+    text {
+      &:nth-child(2) {
+        padding-left: 30rpx;
+        font-size: 28rpx;
+        color: rgba(51,51,51,1);
+      }
+    }
+  }
+  .health-details-img {
+    width: 100%;
+    height: 390rpx;
+  }
+  .img-exp {
+    padding: 21rpx 29rpx;
+    font-size: 28rpx;
+    color: rgba(102,102,102,1);
+    background:rgba(245,245,245,1);
+  }
+  .health-detail-content {
+    padding-bottom: 79rpx;
+    font-size: 34rpx;
+    color: rgba(51,51,51,1);
+    line-height: 50rpx;
+    .text {
+      padding-top: 50rpx;
+    }
+  }
+  .text-label {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    .text-label-child {
+      text-align: center;
+      margin-right: 30rpx;
+      width: 116rpx;
+      height: 36rpx;
+      background: rgba(245,245,245,1);
+      font-size: 24rpx;
+      color: rgba(153,153,153,1);
+      border-radius: 4rpx;
+    }
+  }
+}
+.doYouWant {
+    padding: 53rpx 0 20rpx;
+    background:rgba(245,245,245,1);
+    font-size: 24rpx;
+    color: rgba(153,153,153,1);
+    line-height: 50rpx;
+    text-align: center;
+  }
+  .more-child {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding: 38rpx 0;
+    width: @full-width;
+    .more-img {
+      width: 138rpx;
+      height: 184rpx;
+    }
+    .more-content {
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 464rpx;
+      height: 184rpx;
+      border-bottom: 1rpx solid rgba(234,234,234,1);
+      .more-content-title {
+        font-size:28rpx;
+        color:rgba(51,51,51,1);
+        line-height:42rpx;
+      }
+      .more-content-label-container {
+        padding-bottom: 37rpx;
+        display: inline-flex;
+        justify-content: space-between;
+        align-items: center;
+        width: @full-width;
+        height: 30rpx;
+        font-size:24rpx;
+        color:rgba(205,205,205,1);
+        .desc {
+          flex: 1;
+          height:100%;
+          overflow:hidden;
+          text-overflow:ellipsis;
+          white-space:nowrap;
+        }
+        view {
+          display: inline-flex;
+          flex: 1;
+          justify-content: flex-end;
+          align-items: center;
+          text{
+            text-align:right;
+          }
+        }
+      }
+    }
+  }
+</style>

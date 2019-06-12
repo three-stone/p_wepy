@@ -1,0 +1,190 @@
+<style lang="less">
+  @import '../../styles/common.less';
+  page{
+    background:#F5F5F5;
+  }
+  .container{
+    padding-bottom:51rpx;
+  }
+  .cell{
+    padding:30rpx;
+    height:100rpx;
+    box-sizing:border-box;
+
+  }
+  .cell__bd view,.cell__ft{
+    font-size:28rpx;
+    color:#333333;
+  }
+  .cells{
+    margin-bottom:16rpx;
+  }
+  .cells .cell_tit{
+    height:64rpx;
+  }
+  .add{
+    width:36rpx;
+    height:36rpx;
+    color:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#26B7BC;
+    font-size:36rpx;
+    border-radius:50%;
+  }
+  .sub_btn{
+    width:628rpx;
+    height:90rpx;
+    background:#FF5F62;
+    border-radius:45rpx;
+    color:#fff;
+    font-size:32rpx;
+    text-align:center;
+    line-height:90rpx;
+    margin:0 auto;
+    margin-top:127rpx;
+  }
+  .mask{
+    position: fixed;
+    width:100%;
+    height:100vh;
+    background:rgba(0,0,0,0.5);
+    top:0;
+    left:0;
+    z-index:1000;
+  }
+  .content{
+    width:610rpx;
+    height:300rpx;
+    background:rgba(255,255,255,1);
+    border-radius:20rpx;
+    position: fixed;
+    z-index: 1001;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+.text{
+  width:100%;
+  height:209rpx;
+  padding:20rpx;
+  text-align:center;
+  box-sizing:border-box;
+  font-size:28rpx;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.btn_box{
+  width:100%;
+  height:90rpx;
+  display:flex;
+  border-top:1rpx solid #eaeaea;
+}
+.btn_box view{
+  display:flex;
+  flex:1;
+  justify-content:center;
+  align-items:center;
+  font-size:32rpx;
+}
+.comfirm{
+  border-left:1rpx solid #eaeaea;
+  color:#FF5F62;
+}
+</style>
+<template>
+  <view class="container">
+      <view class="cells selec">
+           <view class="cell">
+              <view class="cell__bd">
+                  <view>药品名称</view>
+              </view>
+              <view class="cell__ft">阿司匹林</view>
+          </view>
+          <view class="cell">
+              <view class="cell__bd">
+                  <view>用药途径</view>
+              </view>
+              <view class="cell__ft">口服</view>
+
+          </view>
+          <view class="cell">
+              <view class="cell__bd">
+                  <view>药品规格</view>
+              </view>
+              <view class="cell__ft">片</view>
+          </view>
+            <view class="cell">
+              <view class="cell__bd">
+                  <view>每次用量</view>
+              </view>
+              <view class="cell__ft">1</view>
+
+          </view>
+          <view class="cell">
+              <view class="cell__bd">
+                  <view>使用频率</view>
+              </view>
+              <view class="cell__ft">每天1次</view>
+
+          </view>
+      </view>
+      <view class="cells">
+          <view class="cell">
+            <view class="cell__bd">
+                <view>记录时间</view>
+            </view>
+            <view class="cell__ft">2018-03-05  13:21</view>
+
+          </view>
+      </view>
+      <view class="sub_btn" @tap='dell'>删除</view>
+  </view>
+  <view class="mask" hidden="{{bool}}">
+      <view class="content">
+          <view class='text'>确定要删除当前药品记录？</view>
+          <view class="btn_box">
+            <view class='cancel' @tap='cancel'>取消</view>
+            <view class='comfirm' @tap='sure_dell'>删除</view>
+          </view>
+      </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class BaseInfo extends wepy.page {
+    config = {
+      navigationBarTitleText: '用药详情'
+    }
+
+    components = {
+
+    }
+    data = {
+      bool: true
+    }
+
+    computed = {
+    }
+
+    methods = {
+      cancel() {
+        this.bool = true
+      },
+      sure_dell() {
+        this.bool = true
+      },
+      dell() {
+        this.bool = false
+      }
+    }
+    events = {
+    }
+    onLoad() {
+    }
+  }
+</script>

@@ -1,0 +1,436 @@
+<style lang="less">
+  @import '../../styles/common.less';
+.container{
+  width:100%;
+  height:100vh;
+  background: #F5F5F5;
+}
+.cells:before {
+    content: " ";
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: 1px;
+    border-top: 2px solid #eaeaea;
+    color: #e5e5e5;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+    z-index: 2;
+}
+.btn_primary{
+  width:631rpx;
+  height:93rpx;
+  border-radius:45rpx;
+  background-color:#26B7BC;
+  text-align: center;
+  line-height: 93rpx;
+  margin: 0 auto;
+  margin-top: 78rpx;
+  font-size: 32rpx;
+  color:#fff;
+}
+.title {
+    color: #999999;
+    font-size: 24rpx;
+    padding: 16rpx 67rpx 0 30rpx; 
+    height:128rpx ; 
+}
+.remind{
+  font-size: 24rpx;
+  color: #999999;
+  padding: 59rpx 30rpx 16rpx 30rpx
+}
+.check{
+  color:#333;
+  width:470rpx;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+</style>
+<template>
+  <view class="container">
+        <view class="cells">
+            <view class="cell cell_access" @tap="open(0)">
+                <view class="cell__bd">
+                    <view>预约人</view>
+                </view>
+                <view class="cell__ft" wx:if="{{p0 == null}}">请选择</view>
+                <view class="cell__ft check" wx:else>{{p0}}</view>
+            </view>
+        </view>
+        <view class='title'>
+          预约人是指使用本次服务的人员，您可以为自己预约 ，也可以 代家人预约。预约人信息必需完整方可选择。
+        </view>
+        <view class="cells">
+            <view class="cell cell_access" @tap="open(1)">
+                <view class="cell__bd">
+                    <view>服务机构</view>
+                </view>
+                <view class="cell__ft" wx:if="{{p1 == null}}">请选择</view>
+                <view class="cell__ft check" wx:else>{{p1}}</view>
+            </view>
+            <view class="cell cell_access" @tap="open(2)">
+                <view class="cell__bd">
+                    <view>服务项目</view>
+                </view>
+                <view class="cell__ft" wx:if="{{p2 == null}}">请选择</view>
+                <view class="cell__ft check" wx:else>{{p2}}</view>
+            </view>
+            <view class="cell cell_access" @tap="open(3)">
+                <view class="cell__bd">
+                    <view>服务人员</view>
+                </view>
+                <view class="cell__ft" wx:if="{{p3 == null}}">请选择</view>
+                <view class="cell__ft check" wx:else>{{p3}}</view>
+            </view>
+        </view>
+        <view class='remind'>可供选择的预约日期和时间段会随您选择的服务人员不同而不同</view>
+        <view class="cells">
+            <view class="cell cell_access" @tap="open(4)">
+                <view class="cell__bd">
+                    <view>预约日期</view>
+                </view>
+                <view class="cell__ft" wx:if="{{p4 == null}}">请选择</view>
+                <view class="cell__ft check" wx:else>{{p4}}</view>
+            </view>
+                <view class="cell cell_access" @tap="open(5)">
+                <view class="cell__bd">
+                    <view>预约时段</view>
+                </view>
+                <view class="cell__ft" wx:if="{{p5 == null}}">请选择</view>
+                <view class="cell__ft check" wx:else>{{p5}}</view>
+            </view>
+        </view>
+        <view class='btn_primary' @tap="next">确定预约</view>
+        <repeat for="{{list}}" key="index" index="index" item="item" wx:if="{{index == SelectedIndex}}">
+          <picker1  :listData="item" ></picker1>
+        </repeat>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showTost, showLoading } from '../../utils/common.js'
+  import { GetPeople, GetOrg, GetServicer, GetDate, GetTime } from '../../apis/common.js'
+  import Select from '../../components/select'
+  export default class AppointmentSuccess extends wepy.page {
+    config = {
+      navigationBarTitleText: '服务预约'
+    }
+    components = {
+      picker1: Select
+    }
+
+    data = {
+      list: [],
+      price: '',
+      schedId: '',
+      SelectedIndex: '',
+      SelectedText: '',
+      p0: null,
+      p1: null,
+      p2: null,
+      p3: null,
+      p4: null,
+      p5: null,
+      pid0: '',
+      pid1: '',
+      pid2: '',
+      pid3: '',
+      pid4: '',
+      pid5: ''
+    }
+
+    computed = {
+    }
+
+    methods = {
+      open(s) {
+        if (this.list[s] !== undefined && this.list[s].length !== 0) {
+          this.SelectedIndex = s
+          this.$invoke('picker1', 'openPicker', '0')
+        }
+      },
+      next() {
+        if (this.p0 !== null && this.p1 !== null && this.p2 !== null && this.p3 !== null && this.p4 !== null && this.p5 !== null) {
+          wepy.navigateTo({
+            url: `/pages/Appointment/AppointmentSubmit?type=1&orgId=${this.pid1}&name=${this.p0}&org=${this.p1}&doctor=${this.p3}&doctorId=${this.pid3}&server=${this.p2}&serverid=${this.pid2}&time=${this.p4}&date=${this.p5}&price=${this.price}&schedId=${this.schedId}`
+          })
+        } else {
+          showTost('请完善预约信息')
+        }
+      }
+    }
+
+    events = {
+      'showchange': function (type) {
+        let that = this
+        let s = 'p' + this.SelectedIndex
+        let id = 'pid' + this.SelectedIndex
+        let idx = type[0]
+        if (this.list[this.SelectedIndex].datas.val.length !== 0) {
+          this[s] = (this.list[this.SelectedIndex].datas.val[idx]).toString().split('(')[0]
+          this[id] = this.list[this.SelectedIndex].Id[idx]
+          switch (this.SelectedIndex) {
+            case '0':
+              // this.p1 = this.p2 = this.p3 = this.p4 = this.p5 = null
+              // this.pid1 = this.pid2 = this.pid3 = this.pid4 = this.pid5 = ''
+              break
+            case '1':
+              this.p2 = this.p3 = this.p4 = this.p5 = null
+              this.pid2 = this.pid3 = this.pid4 = this.pid5 = ''
+              if (this.pid1.length !== 0) {
+                let arry = this.list.slice(0, 2)
+                this.list = arry
+                console.log(this.list)
+                // 获取服务项目
+                let param = {
+                  url: 'organizationServiceItems/organizationServiceItems',
+                  method: 'get',
+                  data: {organizationId: that.pid1},
+                  header: {
+                    'content-type': 'application/x-www-form-urlencoded' // 默认值
+                  }
+                }
+                showLoading()
+                wepy.request(param).then((res) => {
+                  let obj = {
+                    txt: '服务项目',
+                    datas: {val: []},
+                    price: [],
+                    Id: []
+                  }
+                  if (res.resultData.length !== 0) {
+                    res.resultData.forEach((item) => {
+                      obj.datas.val.push(item.singleServiceName)
+                      obj.price.push(item.salePrice)
+                      obj.Id.push(item.singleServiceCode)
+                    })
+                    that.list.splice(2, 1, obj)
+                    that.list = that.list
+                  } else {
+                    that.list.splice(2, 1, [])
+                    that.list = that.list
+                    showTost('未查询到有效数据！')
+                  }
+                }).catch((res) => {
+                  that.list.splice(2, 1, [])
+                  that.list = that.list
+                  showTost('未查询到有效数据！')
+                })
+              }
+              break
+            case '2':
+              this.p3 = this.p4 = this.p5 = null
+              this.pid3 = this.pid4 = this.pid5 = ''
+              that.price = this.list[this.SelectedIndex].price[idx]
+              if (this.pid2.length !== 0) {
+                let arry = this.list.slice(0, 3)
+                this.list = arry
+                console.log(this.list)
+                // 获取服务人员
+                let param = GetServicer({organizationId: that.pid1, singleServiceCode: that.pid2, ticketNumber: ''})
+                showLoading()
+                wepy.request(param).then((res) => {
+                  let obj = {
+                    txt: '服务人员',
+                    datas: {val: []},
+                    Id: []
+                  }
+                  if (res.resultData.list.length !== 0) {
+                    res.resultData.list.forEach((item) => {
+                      let doctor
+                      doctor = item.name
+                      obj.datas.val.push(doctor)
+                      obj.Id.push(item.id)
+                    })
+                    that.list.splice(3, 1, obj)
+                    that.list = that.list
+                  } else {
+                    that.list.splice(3, 1, [])
+                    that.list = that.list
+                    showTost('未查询到有效数据！')
+                  }
+                }).catch((res) => {
+                  that.list.splice(3, 1, [])
+                  that.list = that.list
+                  showTost('未查询到有效数据！')
+                })
+              }
+              break
+            case '3':
+              this.p4 = this.p5 = null
+              this.pid4 = this.pid5 = ''
+              if (this.pid3.length !== 0) {
+                let arry = this.list.slice(0, 4)
+                this.list = arry
+                console.log(this.list)
+                // 预约日期
+                let param = GetDate({orgId: that.pid1, peopleId: that.pid3, flag: '2', serviceId: that.pid2, date: ''})
+                showLoading()
+                wepy.request(param).then((res) => {
+                  let obj = {
+                    txt: '预约日期',
+                    datas: {val: []},
+                    Id: []
+                  }
+                  if (res.content.length !== 0 && res.content.length !== null) {
+                    res.content.forEach((item) => {
+                      obj.datas.val.push(item.date)
+                      obj.Id.push(item.flag)
+                    })
+                    that.list.splice(4, 1, obj)
+                    that.list = that.list
+                  } else {
+                    that.list.splice(4, 1, [])
+                    that.list = that.list
+                    showTost('未获取到有效日期')
+                  }
+                }).catch((res) => {
+                  that.list.splice(4, 1, [])
+                  that.list = that.list
+                  showTost('未获取到有效日期')
+                })
+              }
+              break
+            case '4':
+              this.p5 = null
+              this.pid5 = ''
+              if (this.pid4.length !== 0) {
+                // 预约日期时间段
+                let param = GetTime({orgId: that.pid1, peopleId: that.pid3, flag: 2, serviceId: that.pid2, date: that.p4})
+                showLoading()
+                wepy.request(param).then((res) => {
+                  let obj = {
+                    txt: '预约时段',
+                    datas: {val: []},
+                    Id: [],
+                    price: [],
+                    schedId: []
+                  }
+                  if (res.content.length !== 0 && res.content.length !== null) {
+                    res.content.forEach((item) => {
+                      let str = item.startTime + ' - ' + item.endTime
+                      obj.datas.val.push(str)
+                      obj.Id.push(item.schedId)
+                      obj.price.push(item.price)
+                      obj.schedId.push(item.schedId)
+                    })
+                    that.list.splice(5, 1, obj)
+                    that.list = that.list
+                  } else {
+                    that.list.splice(5, 1, [])
+                    that.list = that.list
+                    showTost('未获取到有效时间段')
+                  }
+                }).catch((res) => {
+                  that.list.splice(5, 1, [])
+                  that.list = that.list
+                  showTost('未获取到有效时间段')
+                })
+              }
+              break
+            case '5':
+              that.schedId = this.list[this.SelectedIndex].schedId[idx]
+              console.log(that.list)
+              break
+            default:
+              break
+          }
+        }
+      }
+    }
+    onLoad() {
+      let that = this
+      // 获取预约人
+      let param = GetPeople(wepy.getStorageSync('memberId'))
+      showLoading()
+      wepy.request(param).then((res) => {
+        let obj = {
+          txt: '预约人',
+          datas: {val: []},
+          Id: []
+        }
+        let strs
+        if (wepy.getStorageSync('memberInfo').name.length === 0 || wepy.getStorageSync('memberInfo').name === null) {
+          strs = wepy.getStorageSync('memberInfo').phone
+        } else {
+          strs = wepy.getStorageSync('memberInfo').name
+        }
+        let myself = strs + ' (自己)'
+        obj.datas.val.push(myself)
+        res.resultData.forEach((item, index) => {
+          let s = item.familyName === null ? ' ' : item.familyName
+          let arr = []
+          let ship
+          switch (item.relation) {   // 与家长的关系(0、父亲 1、母亲 2、妻子 3、丈夫 4、儿子 5、女儿 6、岳父 7、岳母 8、其他
+            case 0:
+              ship = '父亲'
+              break
+            case 1:
+              ship = '母亲'
+              break
+            case 2:
+              ship = '妻子'
+              break
+            case 3:
+              ship = '丈夫'
+              break
+            case 4:
+              ship = '儿子'
+              break
+            case 5:
+              ship = '女儿'
+              break
+            case 6:
+              ship = '岳父'
+              break
+            case 7:
+              ship = '岳母'
+              break
+            case 8:
+              ship = '其他'
+              break
+            default:
+              break
+          }
+          s = item.familyInfo.name + '(' + ship + ')'
+          arr.push(s)
+          obj.Id.push(item.familyId)
+          obj.datas.val.push(arr)
+        })
+        that.list.push(obj)
+        that.list = that.list
+      }).then(() => {
+        // 获取服务机构列表
+        let param = GetOrg({pageNo: 1, pageSize: 10})
+        wepy.request(param).then((data) => {
+          console.log(data)
+          let obj = {
+            txt: '服务机构',
+            datas: {val: []},
+            Id: []
+          }
+          if (data.length !== 0) {
+            data.resultData.list.forEach((item) => {
+              obj.Id.push(item.id)
+              obj.datas.val.push(item.name)
+            })
+            that.list.push(obj)
+            that.list = that.list
+          } else {
+            showTost('未查询到有效数据')
+          }
+        }).catch((data) => {
+          showTost('未查询到有效数据')
+        })
+      }).catch((res) => {
+        console.log(res)
+      })
+    }
+  }
+</script>

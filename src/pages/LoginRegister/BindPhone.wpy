@@ -1,0 +1,157 @@
+<style lang="less">
+  @import '../../styles/common.less';
+  page{
+    background:#fff;
+  }
+  .container{
+    padding-bottom:51rpx;
+  }
+  .cell{
+    padding:30rpx 60rpx;
+    height:120rpx;
+    box-sizing:border-box;
+
+  }
+  .cell__bd view,.cell__ft{
+    font-size:28rpx;
+    color:#333333;
+  }
+  .cell:before {
+    left:60rpx;
+    right:60rpx;
+  }
+  .cell_b:after{
+    content: " ";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 1px;
+    border-top: 4rpx solid #EAEAEA;
+    color: #e5e5e5;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+    left:60rpx;
+    right:60rpx;
+    z-index: 2;
+  }
+  .sub_btn{
+    width:628rpx;
+    height:90rpx;
+    background:rgba(38,183,188,1);
+    border-radius:45rpx;
+    color:#fff;
+    font-size:32rpx;
+    text-align:center;
+    line-height:90rpx;
+    margin:0 auto;
+    margin-top:160rpx;
+  }
+  .disabled{
+    opacity:0.5;
+  }
+  .pld{
+    font-size:28rpx;
+    color:rgba(205,205,205,1);
+  }
+  .head{
+    height:291rpx;
+    width:100%;
+    background:#fff;
+    color:#333;
+    font-size:48rpx;
+    padding-top:146rpx;
+    box-sizing:border-box;
+    padding-left:59rpx;
+    margin-bottom:16rpx;
+  }
+  .link{
+    display:flex;
+    width:628rpx;
+    padding:20rpx;
+    margin:0 auto;
+    box-sizing:border-box;
+    justify-content:space-between;
+        navigator{
+          color:#26B7BC;
+          font-size:26rpx;
+        }
+  }
+  .footer{
+    position: fixed;
+    width:500rpx;
+    left:125rpx;
+    bottom:38rpx;
+    font-size:24rpx;
+    color:#333333;
+    display:flex;
+      navigator{
+          color:#26B7BC;
+          font-size:22rpx;
+      }
+  }
+  .admin{
+    background:#fff;
+    margin-top:69rpx;
+    border:1px solid #3CB2B9;
+    color:#26B7BC;
+  }
+  .cell_b{
+    margin-top:16rpx;
+  }
+  .code{
+    padding-left:20rpx;
+    border-left:1px solid #eaeaea;
+    color:#26B7BC;
+    font-size:24rpx;
+  }
+</style>
+<template>
+  <view class="container">
+      <view class="head">
+        绑定手机号
+      </view>
+      <view class="cells">
+           <view class="cell">
+              <view class="cell__bd">
+                 <input type="text" placeholder="输入一个手机号" placeholder-class="pld"></input>
+              </view>
+          </view>
+          <view class="cell">
+              <view class="cell__bd">
+                  <input type="text" placeholder="填写验证码" placeholder-class="pld"></input>
+              </view>
+              <view class="cell__ft">
+                <view class='code '>获取验证码</view>
+              </view>
+          </view>
+      </view>
+      <view class="sub_btn disabled">下一步</view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class Register extends wepy.page {
+    config = {
+      navigationBarTitleText: '绑定手机号'
+    }
+
+    components = {
+    }
+    data = {
+    }
+
+    computed = {
+    }
+
+    methods = {
+    }
+    events = {
+    }
+    onLoad() {
+    }
+  }
+</script>

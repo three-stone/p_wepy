@@ -1,0 +1,139 @@
+<style lang="less">
+.pick-box {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  z-index:99;
+}
+.picker-box {
+  position: absolute;
+  width:100%;
+  height:100vh;
+  background: rgba(0, 0, 0, 0.2);
+}
+.picker-style {
+  position: absolute;
+  height: 472rpx; 
+  width:100%;
+  z-index: 11;
+  background: #fff;
+  bottom: 0;
+  bottom: -100%;
+  padding: 0 34rpx;
+  box-sizing:border-box;
+}
+.picker-item{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #333;
+  font-size: 32rpx;
+  height: 123rpx;
+  word-break:break-all;
+  overflow:hidden;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  text-overflow:ellipsis;
+}
+.picker-but {
+  height: 103rpx;
+  box-sizing: border-box;
+  padding-bottom: 0rpx;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  border-bottom: 1rpx solid #eaeaea;
+}
+.picker-but view {
+  display: flex;
+  box-sizing: border-box;
+  font-size: 30rpx;
+  justify-content: center;
+  align-items: center;
+  height: 103rpx;
+  width: 100rpx;
+}
+</style>
+<template>
+  <view wx:if="{{isOpen}}" class="pick-box">
+    <view class="picker-box"></view>
+    <view class="picker-style" animation="{{pickerAnimation}}">
+      <view class="picker-but">
+        <view @tap="_closePicker" style="color:#999999;">取消</view>
+        <view style="font-size:30rpx;color:#333333;width:200rpx">{{listData.txt}}</view>
+        <view @tap="_surePicker" style="color:#26B7BC;">确定</view>
+      </view>
+      <picker-view indicator-style="height:40px;border-top:1px solid #eaeaea;border-bottom:1px solid #eaeaea;color:#26B7BC;" style="height: 369rpx;" value="{{value}}" @change="_bindChange">
+        <picker-view-column wx:for="{{listData.datas}}" wx:for-index="idx" wx:key="{{index}}">
+          <view wx:for="{{item}}" wx:for-item="less" class="picker-item" wx:for-index="idx" wx:key="*this">
+            {{less}}
+          </view>
+        </picker-view-column>
+      </picker-view>
+    </view>
+ </view> 
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class Select extends wepy.component {
+    props = {
+      listData: {}
+    }
+    data = {
+      isOpen: false,
+      pickerAnimation: {},
+      value: []
+    }
+
+    events = {
+
+    }
+    methods = {
+      _closePicker() {
+        this._openClosePicker(1)
+        this.isOpen = false
+      },
+      _bindChange(e) {
+        let val = e.detail.value
+        this.value = val
+      },
+      _surePicker() {
+        let num
+        this.value.length === 0 ? num = [0] : num = this.value
+        this.$emit('showchange', num)
+        this._openClosePicker(1)
+        this.isOpen = false
+      }
+
+    }
+      // 点击事件，点击弹出选择页
+    openPicker(flag) {
+      this.isOpen = true
+      this.value = []
+      this._openClosePicker(flag)
+    }
+    _openClosePicker(flag) {
+      let animationBox = wepy.createAnimation({
+        duration: 2000,
+        timingFunction: 'ease'
+      })
+      if (flag === 1) {
+        animationBox.bottom('-100%').step()
+      } else {
+        animationBox.bottom(0).step()
+      }
+      this.pickerAnimation = animationBox.export()
+      this.$apply()
+    }
+
+    computed = {
+    }
+
+    onLoad () {
+    }
+  }
+</script>

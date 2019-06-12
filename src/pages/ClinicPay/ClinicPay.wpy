@@ -1,0 +1,350 @@
+<style lang="less">
+  @import '../../styles/common.less';
+page{
+  background:#F5F5F5;
+}
+.container{
+  width:100%;
+  padding-top:16rpx;
+}
+.tab{
+  height:88rpx;
+  width:100%;
+  display:flex;
+  padding:0 133rpx;
+  background:#fff;
+  justify-content:space-between;
+  box-sizing:border-box;
+  border-top:1px solid #eaeaea;
+}
+.tab view{
+  color:#999;
+  height:100%;
+  display:flex;
+  align-items:center;
+  font-size:28rpx;
+  padding:0 10rpx;
+  box-sizing:border-box;
+}
+.tab .selected{
+  color:#26B7BC;
+  border-bottom:4rpx solid #26B7BC;
+}
+.nothing{
+  margin-top:180rpx;
+  width:100%;
+  text-align:center;
+}
+.nothing image{
+  width:277rpx;
+  height:200rpx;
+  margin:0 auto;
+  margin-bottom:40rpx;
+}
+.nothing view{
+  color:#999;
+  font-size:28rpx;
+  text-align:center;
+}
+.main{
+  width:100%;
+}
+.Unpaid_list,.pay_list{
+  width:100%;
+  margin-top:17rpx
+}
+.cell{
+  height:190rpx;
+  padding:0 30rpx;
+}
+.ShopName,.time{
+  font-size:24rpx;
+  color:#999999;
+  margin-top:12rpx
+}
+.title{
+  font-size:28rpx;
+  color:#333333;
+}
+.price{
+  font-size:34rpx;
+  color:#26B7BC;
+}
+.cell:before{
+  left:0;
+  right:0;
+}
+.cells .tit{
+  height:80rpx;
+
+}
+.tit view{
+  font-size:24rpx;
+}
+.goods{
+  padding-left:30rpx;
+   border-top: 1rpx solid #EAEAEA;
+     border-bottom: 1rpx solid #EAEAEA;
+}
+.detail{
+    padding: 35rpx 30rpx 37rpx 30rpx;
+   border-top: 1rpx solid #EAEAEA;
+    border-bottom: 1rpx solid #EAEAEA;
+}
+.detail view{
+  font-size:24rpx;
+  color:rgba(153,153,153,1);
+  margin-bottom:6rpx;
+}
+.goodsItem{
+    display:flex;
+    padding:30rpx 30rpx 30rpx 0;
+    position: relative;
+    height:176rpx;
+    box-sizing:border-box;
+}
+.ItemLeft image{
+    height:110rpx;
+    width:110rpx;
+    margin-right:30rpx;
+}
+.ItemRight{
+  width:100%;
+}
+.ItemRight view{
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}
+.goodsItem::before {
+    content: " ";
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: 1px;
+    border-top: 4rpx solid #EAEAEA;
+    color: #e5e5e5;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+    left: 136rpx;
+    z-index: 2;
+}
+.goodsItem:first-child:before {
+    display: none;
+}
+.CartName,.detail .name{
+  font-size:28rpx;
+  color:#333333;
+}
+.CartType{
+  font-size:24rpx;
+  color:#999;
+  margin:6rpx 0;
+}
+.PriceBox{
+  display:flex;
+  width:100%;
+  justify-content:space-between;
+}
+.Price{
+  font-size:32rpx;
+  color:#FF8700;
+}
+.num{
+  font-size:28rpx;
+  color:#333333;
+}
+.total{
+  padding:34rpx 30rpx 28rpx 30rpx;
+  background:#fff;
+}
+.total view{
+  font-size:24rpx;
+}
+.desc{
+  color:#333333;
+  width:100%;
+  text-align:right;
+}
+.btn_box{
+  display:flex;
+  justify-content:flex-end;
+  margin-top:40rpx;
+}
+.btn_pay{
+  width:150rpx;
+  height:56rpx;
+  background:rgba(38,183,188,1);
+  border-radius:28px;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.cells{
+  margin-bottom:16rpx;
+}
+</style>
+<template>
+  <view class="container">
+      <view class="nothing" wx:if="{{OrderList.length === 0}}">
+          <image src='../../assets/images/msg_icon_appointment_nothing.png' ></image>
+          <view style='margin-bottom:19rpx;'>您还没有待支付订单记录</view>
+          <view>已支付订单记录请前往我的订单查看</view>  
+      </view>
+      <view class='main' wx:else>
+      <view wx:for="{{OrderList}}" wx:key="{{index}}">
+        <view class="cells" hidden>
+            <view class="cell tit">
+                <view class="cell__bd">
+                  <view>2018-01-13  11:34</view>
+                </view>
+                <view class="cell__ft price">待支付</view>
+            </view>
+            <view class="goods">
+                <view class='goodsItem'>
+                  <view class="ItemLeft">
+                    <image></image>
+                  </view>
+                  <view class="ItemRight">
+                      <view class="CartName">高血压专项服务套餐卡</view>
+                      <view class="CartType">月度卡</view>
+                      <view class="PriceBox">
+                        <text class="Price">¥188</text>
+                        <text class='num'>x1</text>
+                      </view>
+                  </view>
+                </view>
+                <view class='goodsItem'>
+                  <view class="ItemLeft">
+                    <image></image>
+                  </view>
+                  <view class="ItemRight">
+                      <view class="CartName">高血压专项服务套餐卡</view>
+                      <view class="CartType">月度卡</view>
+                      <view class="PriceBox">
+                        <text class="Price">¥188</text>
+                        <text class='num'>x1</text>
+                      </view>
+                  </view>
+                </view>
+            </view>
+            <view class='total'>
+              <view class="desc">
+                共计4件商品 合计：<text class='Price'>￥856.75</text>（含运费¥0.00元）
+              </view>
+              <view class="btn_box">
+                  <view class="btn_pay">立即支付</view>
+              </view>
+            </view>
+        </view>
+        
+        <view class="cells">
+            <view class="cell tit">
+                <view class="cell__bd">
+                  <view>{{item.orderDate}}</view>
+                </view>
+                <view class="cell__ft price">待支付</view>
+            </view>
+            <view class="detail">
+                <view class='name'>{{item.bespeakProject}}</view>
+                <view>机构：{{item.bespeakUnitName}}</view>
+                <view>服务人员：{{item.doctorName}}</view>
+                <view>预约时间：{{item.bespeakDate}} {{item.bespeakTime}}</view>
+            </view>
+            <view class='total'>
+              <view class="desc">
+                共计1件商品 合计：<text class='Price'>￥{{item.payAmt}}</text>（含运费¥0.00元）
+              </view>
+              <view class="btn_box">
+                  <view class="btn_pay"  @tap="topay({{item.orderCode}},{{item.payAmt}})">立即支付</view>
+              </view>
+            </view>
+        </view>
+
+      </view>
+
+      </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showTost, showLoading } from '../../utils/common'
+  export default class ClinicPay extends wepy.page {
+    config = {
+      navigationBarTitleText: '门诊缴费',
+      'navigationBarTextStyle': 'black',
+      'enablePullDownRefresh': true,
+      'backgroundTextStyle': 'dark'
+    }
+
+    components = {
+    }
+    data = {
+      OrderList: [],
+      Isload: false
+    }
+
+    computed = {
+    }
+    // 下拉刷新
+    onPullDownRefresh () {
+      if (this.Isload) {
+        wepy.showNavigationBarLoading()
+        this.getData(wepy.getStorageSync('memberInfo').memberCode)
+      }
+    }
+
+    methods = {
+      click(e) {
+        this.idx = e.currentTarget.dataset.index
+        console.log(this.idx)
+      },
+      topay(code, price) {
+        wepy.navigateTo({
+          url: `/pages/Appointment/PayConfirm?orderId=${code}&price=${price}`
+        })
+      }
+    }
+    getData(membercode) {
+      showLoading()
+      let that = this
+      let param = {
+        url: 'appUser/prescribeOrder/getToBePaidOrderList/' + membercode,
+        method: 'get',
+        data: {},
+        header: {
+          'content-type': 'application/x-www-form-urlencoded' // 默认值
+        }
+      }
+      that.Isload = false
+      wepy.request(param).then((data) => {
+        that.Isload = true
+        that.OrderList = data.resultData.bespeakOrder
+        setTimeout(function () {
+          wepy.hideNavigationBarLoading()
+          wepy.stopPullDownRefresh()
+        }, 500)
+        wepy.hideLoading()
+        this.$apply()
+      }).catch((data) => {
+        that.Isload = true
+        setTimeout(function () {
+          wepy.hideNavigationBarLoading()
+          wepy.stopPullDownRefresh()
+        }, 500)
+        wepy.hideLoading()
+        showTost(data.resultDesc)
+      })
+    }
+    onLoad() {
+    }
+    onShow () {
+      this.getData(wepy.getStorageSync('memberInfo').memberCode)
+    }
+  }
+</script>

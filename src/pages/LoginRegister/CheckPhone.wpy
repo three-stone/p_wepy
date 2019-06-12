@@ -1,0 +1,238 @@
+<style lang="less">
+  @import '../../styles/common.less';
+  page{
+    background:#fff;
+  }
+  .cell{
+    padding:50rpx 60rpx 30rpx 60rpx;
+    height:114rpx;
+    box-sizing:border-box;
+
+  }
+  .cell__bd view,.cell__ft{
+    font-size:28rpx;
+    color:#333333;
+  }
+  .cell:before {
+    left:60rpx;
+    right:60rpx;
+  }
+  .cell_b:after{
+    content: " ";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 1px;
+    border-top: 4rpx solid #EAEAEA;
+    color: #e5e5e5;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+    left:60rpx;
+    right:60rpx;
+    z-index: 2;
+  }
+  .sub_btn{
+    width:628rpx;
+    height:90rpx;
+    background:rgba(38,183,188,1);
+    border-radius:45rpx;
+    color:#fff;
+    font-size:32rpx;
+    text-align:center;
+    line-height:90rpx;
+    margin:0 auto;
+    margin-top:160rpx;
+  }
+  .disabled{
+    opacity:0.5;
+  }
+  .pld{
+    font-size:28rpx;
+    color:rgba(205,205,205,1);
+  }
+  .head{
+    height:291rpx;
+    width:100%;
+    background:#fff;
+    color:#333;
+    font-size:48rpx;
+    padding-top:146rpx;
+    box-sizing:border-box;
+    padding-left:59rpx;
+    margin-bottom:16rpx;
+  }
+  .link{
+    display:flex;
+    width:628rpx;
+    padding:20rpx;
+    margin:0 auto;
+    box-sizing:border-box;
+    justify-content:space-between;
+        navigator{
+          color:#26B7BC;
+          font-size:26rpx;
+        }
+  }
+  .footer{
+    position: fixed;
+    width:500rpx;
+    left:125rpx;
+    bottom:38rpx;
+    font-size:24rpx;
+    color:#333333;
+    display:flex;
+      navigator{
+          color:#26B7BC;
+          font-size:22rpx;
+      }
+  }
+  .admin{
+    background:#fff;
+    margin-top:69rpx;
+    border:1px solid #3CB2B9;
+    color:#26B7BC;
+  }
+  .code{
+    padding-left:20rpx;
+    border-left:1px solid #eaeaea;
+    color:#26B7BC;
+    font-size:28rpx;
+    width:140rpx;
+    text-align:center;
+  }
+</style>
+<template>
+  <view class="container">
+      <view class="head">
+        手机号验证
+      </view>
+      <view class="cells">
+           <view class="cell">
+              <view class="cell__bd">
+                 <input type="text" placeholder="请输入注册用的手机号" @input='MobileChange' value="{{mobile}}" placeholder-class="pld"></input>
+              </view>
+          </view>
+          <view class="cell cell_b">
+              <view class="cell__bd">
+                  <input type="text" placeholder="填写验证码" value="{{codeval}}" @input="CodeChange" placeholder-class="pld"></input>
+              </view>
+              <view class="cell__ft">
+                <view class='code ' @tap="getcode">{{code}}</view>
+              </view>
+          </view>
+      </view>
+      <view class="sub_btn {{mobile.length===0?'disabled':''}}" @tap="{{mobile.length !==0 ? 'next' : '' }}">下一步</view>
+      <navigator url='/pages/LoginRegister/Login' hover-class='none' class="sub_btn admin">登录</navigator>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showTost } from '../../utils/common.js'
+  export default class Register extends wepy.page {
+    config = {
+      navigationBarTitleText: ' '
+    }
+
+    components = {
+    }
+    data = {
+      code: '获取验证码',
+      codenum: 60,
+      codeval: '',
+      mobile: '',
+      codeAuthToken: '',
+      IsgetCode: true,
+      time: ''
+    }
+
+    computed = {
+    }
+
+    methods = {
+      MobileChange (e) {
+        this.mobile = e.detail.value
+      },
+      CodeChange (e) {
+        this.codeval = e.detail.value
+      },
+      getcode () {
+        if (this.IsgetCode) {
+          if (this.mobile === '') {
+            showTost('手机号不能为空')
+            return
+          }
+          if (!(/^1[3|4|5|6|7|8|9]\d{9}$/.test(this.mobile))) {
+            showTost('手机号不正确')
+            return
+          }
+          let that = this
+          let num = that.codenum
+          that.IsgetCode = false
+          let param = {
+            url: '/userController/sendCode',
+            method: 'get',
+            data: {phone: that.mobile, type: 1},
+            header: {
+              'content-type': 'application/x-www-form-urlencoded' // 默认值
+            }
+          }
+          wepy.request(param).then((res) => {
+            that.code = '60s'
+            that.codeAuthToken = res.resultData.codeAuthToken
+            const Timer = setInterval(() => {
+              if (that.codenum > 0) {
+                num--
+                that.code = num + 's'
+                that.codenum = num
+              } else {
+                that.code = '获取验证码'
+                that.codenum = 60
+                that.IsgetCode = true
+                clearInterval(Timer)
+              }
+              that.time = Timer
+              this.$apply()
+            }, 1000)
+          }).catch((res) => {
+            showTost(res.resultDesc)
+          })
+        }
+      },
+      // 下一步
+      next () {
+        if (this.codeval.length === 0) {
+          showTost('请输入验证码')
+          return
+        }
+        let that = this
+        let param = {
+          url: '/userController/checkVerifyCode',
+          method: 'get',
+          data: {code: that.codeval, codeAuthToken: that.codeAuthToken, phone: that.mobile},
+          header: {
+            'content-type': 'application/x-www-form-urlencoded' // 默认值
+          }
+        }
+        wepy.request(param).then((res) => {
+          wepy.navigateTo({
+            url: '/pages/LoginRegister/ResetPassword?code=' + that.codeval + '&codeAuthToken=' + that.codeAuthToken + '&phone=' + that.mobile
+          })
+        }).catch((res) => {
+          showTost(res.resultDesc)
+        })
+      }
+    }
+    events = {
+    }
+    onUnload() {
+      let that = this
+      clearInterval(that.time)
+    }
+    onLoad() {
+    }
+  }
+</script>

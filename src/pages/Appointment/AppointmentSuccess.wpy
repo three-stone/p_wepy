@@ -1,0 +1,68 @@
+<style lang="less">
+  page{
+    background:#F5F5F5;
+  }
+  .nothing{
+  margin-top:180rpx;
+  width:100%;
+  text-align:center;
+}
+.nothing image{
+  width:249rpx;
+  height:195rpx;
+  margin:0 auto;
+  margin-bottom:40rpx;
+}
+.nothing view{
+  color:#999;
+  font-size:28rpx;
+  text-align:center;
+}
+.goorder{
+  width:300rpx;
+height:90rpx;
+border-radius:45rpx;
+margin:0 auto;
+border:1rpx solid #26B7BC;
+text-align:center;
+line-height:90rpx;
+margin-top:127rpx;
+color:#26B7BC;
+font-size:32rpx;
+}
+</style>
+<template>
+  <view class="container" >
+      <view class="nothing" >
+          <image src='https://rs02.kanghehealth.com/wx/image/msg_icon_success.png' ></image>
+          <view>您已经完成预约，详情可以在“我的订单”中查看</view>
+      </view>
+      <!-- <navigator url='/pages/ClinicPay/ClinicPay' hover-class='none' class='goorder'>查看订单</navigator>  --> 
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class AppointmentSuccess extends wepy.page {
+    config = {
+      navigationBarTitleText: '预约成功'
+    }
+
+    components = {
+
+    }
+    data = {
+
+    }
+
+    computed = {
+    }
+
+    methods = {
+
+    }
+
+    onLoad() {
+    }
+  }
+</script>

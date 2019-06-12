@@ -1,0 +1,429 @@
+<style lang="less">
+  @import '../../styles/common.less';
+@import '../../utils/wxParse.wxss';
+  page{
+    background:#F5F5F5;
+  }
+  .cell{
+    padding:30rpx;
+    height:100rpx;
+    box-sizing:border-box;
+  }
+  .cell__bd view,.cell__ft{
+    font-size:28rpx;
+    color:#333333;
+  }
+.cell__bd .name{
+  height:72rpx;
+  margin-bottom:10rpx;
+  overflow:hidden;
+  white-space:normal!important;
+  box-sizing:border-box;
+  display:-webkit-box;
+  word-break:break-all;
+  text-overflow:ellipsis;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  }
+   .cell__bd .detail{
+    width:100%;
+    font-size:26rpx;
+    color:#666;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+   }
+  .cell__bd .title{
+    width:438rpx;
+    font-size:38rpx;
+    color:#26B7BC;
+    font-weight:800;
+  }
+  .head{
+    height:149rpx;
+    background:#26B7BC;
+    color:#fff;
+    font-size:40rpx;
+    padding:0 30rpx;
+    line-height:149rpx;
+  }
+  ._head{
+    width:100%;
+    height:180rpx;
+  }
+  ._head image{
+    width:100%;
+    height:100%;
+  }
+  .cells{
+    margin-bottom:16rpx;
+  }
+  .result{
+    width:100%;
+    height:100rpx;
+    background:rgba(38,183,188,1);
+    color:#fff;
+    font-size:28rpx;
+    text-align:center;
+    line-height:100rpx;
+  }
+  .weui-loadmore {
+    width: 100%;
+    margin: 1.5em auto;
+    line-height: 1.6em;
+    font-size: 14px;
+    text-align: center;
+}
+.divider{
+  width: 100%;
+    margin: 0 auto;
+    margin-bottom:16rpx;
+    margin-top:40rpx;
+    font-size: 24rpx;
+    text-align: center;
+    display: flex;
+}
+.divider:before,.divider:after{
+    position: relative;
+    top: -1px;
+    flex: 1;
+    content: '';
+    border-top: 1px solid #E5E5E5;
+}
+.divider text{
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  top: -17rpx;
+  padding: 0 17rpx;
+  color: #999999;
+}
+.desc{
+  height:105rpx;
+  padding:0 30rpx 16rpx 30rpx;
+  font-size:24rpx;
+  color:#999;
+}
+.cell__bd .suggest {
+  padding-left:24rpx;
+  color:#26B7BC;
+  font-size:26rpx;
+  position: relative;
+}
+.suggest:before{
+  position:absolute;
+  content: ' ';
+  display:block;
+  left:0rpx;
+  bottom:-10rpx;
+  width:8rpx;
+  height:26rpx;
+  background:rgba(38,183,188,1);
+  border-radius:4px;
+  border: 1px solid #26B7BC;
+}
+.cell .more {
+  color:#9c9c9c;
+  font-size:24rpx;
+}
+.item_left,.item_right{
+  width:326rpx;
+  text-align:center;
+  font-size:28rpx;
+}
+.item_left image,.item_right image{
+  width:326rpx;
+  height:326rpx;
+  margin-bottom:30rpx;
+}
+.item_left .price,.item_right .price{
+  color:#FF8700;
+  margin-top:10rpx;
+}
+.goodslist{
+  display:flex;
+  flex:1;
+  justify-content:space-between;
+  padding-bottom:20rpx;
+
+}
+.way .waydetail{
+  min-height:185rpx;
+  height:auto;
+}
+.cell_tit{
+height:64rpx;
+font-size:26rpx;
+}
+.b_no:before{
+  display:none;
+}
+</style>
+<template>
+  <view class="container" >
+      <view class="head" hidden>
+        慢性失眠诊断初筛表-测评结果
+        <image src="../../assets/images/b_title_zhongyi-.png"></image>
+      </view>
+      <view class="_head">
+        <image src="../../assets/images/b_title_zhongyi-.png"></image>
+      </view>
+      <view class="cells">
+          <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>测评人</view>
+              </view>
+              <view class="cell__ft">{{info.name}}</view>
+          </view>
+           <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>性别</view>
+              </view>
+              <view class="cell__ft " wx:if='{{info.sex == 0}}'>男</view>
+              <view class="cell__ft " wx:if='{{info.sex == 1}}'>女</view>
+              <view class="cell__ft " wx:if='{{info.sex == 2}}'>未知</view>
+          </view>
+          <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>出生日期</view>
+              </view>
+              <view class="cell__ft">{{info.birthday}}</view>
+          </view>
+      </view>
+<!--       <view class="cells">
+           <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>文化程度</view>
+              </view>
+              <view class="cell__ft">大学本科</view>
+          </view>
+          <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>职业</view>
+              </view>
+              <view class="cell__ft">农、林、牧、渔</view>
+          </view>
+                    <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>宗教信仰</view>
+              </view>
+              <view class="cell__ft">无</view>
+          </view>
+      </view>
+      <view class="cells">
+           <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>吸烟史</view>
+              </view>
+              <view class="cell__ft ">10年，10支/天</view>
+          </view>
+          <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>饮酒史</view>
+              </view>
+              <view class="cell__ft">8年，30ml/天</view>
+          </view>
+      </view>
+      <view class='cells' >
+           <view class="cell" data-index='0' style="height:172rpx">
+              <view class="cell__bd">
+                  <view class="name">药物或接触过敏史</view>
+                  <view class="detail">青霉素就是过敏过敏过敏啊。。。。。。</view>
+              </view>
+          </view>
+          <view class="cell" data-index='0' style="height:172rpx">
+              <view class="cell__bd">
+                  <view class="name">既往病史（包括药物、酒精依赖史）</view>
+                  <view class="detail">青霉素就是过敏过敏过敏啊。。。。。。</view>
+              </view>
+          </view>
+      </view>
+      <view class="cells">
+          <view class="cell cell_tit" data-index='0'>
+              <view class="cell__bd">
+                  <view>用药记录</view>
+              </view>
+          </view>
+          <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>糖尿病</view>
+              </view>
+              <view class="cell__ft">2017-09-01确诊，未愈</view>
+          </view>
+           <view class="cell" data-index='0'>
+              <view class="cell__bd">
+                  <view>高血压</view>
+              </view>
+              <view class="cell__ft ">2017-09-01确诊，未愈</view>
+          </view>
+      </view>
+      <view >
+        <view class="cells">
+            <view class="cell cell_tit" data-index='0'>
+                <view class="cell__bd">
+                    <view>体质得分</view>
+                </view>
+            </view>
+            <view class="cell" data-index='0' style="height:660rpx;">
+                <canvas class="canvas" canvas-id="columnCanvas"  style="height:600rpx;width:100%;"></canvas>
+            </view>
+        </view> -->
+<!--         <view class="divider">
+           <text>调养方案</text>
+        </view>
+        <view class="cells way">
+            <view class="cell cell_tit" data-index='0'>
+                <view class="cell__bd">
+                    <view>养生方案</view>
+                </view>
+            </view>
+            <view class="cell waydetail" data-index='0'>
+                <view class="cell__bd">
+                    <view>
+                      阴虚体质饮食调养应保阴潜阳，宜清淡，远肥腻厚味、燥烈之品；可多吃些芝麻、糯米、蜂蜜、乳品、甘蔗、鱼类等清淡食物，对于葱、姜、蒜、韭、薤、椒等辛味之品则应少吃。
+                    </view>
+                </view>
+            </view>
+        </view> -->
+        <view class="cells way" >
+            <view class="cell cell_tit" data-index='0' >
+                <view class="cell__bd">
+                    <view>干预方案</view>
+                </view>
+            </view>
+            <view class="cell waydetail" data-index='0' wx:for="{{result.intervenes}}" wx:key="*this">
+                <view class="cell__bd">
+                    <view>
+                        <import src="../../utils/wxParse.wxml"/>
+                        <template is="wxParse" data="{{wxParseData:article.nodes}}"/>
+                    </view>
+                </view>
+            </view>
+        </view>
+        <view class='desc'>
+          温馨提示：以上调养方案由道生云中医提供
+        </view>
+<!--         <view class="cells" >
+            <view class="cell cell_tit" data-index='0' >
+                <view class="cell__bd">
+                    <view class="suggest">推荐服务</view>
+                </view>
+                 <view class="cell__ft more">更多</view>
+            </view>
+            <view class="cell b_no" data-index='0' style="height:500rpx;padding:0 30rpx;">
+                <view class="goodslist">
+                    <view class="item_left">
+                      <image src="../../assets/images/default_binglixiangqing.png"></image>
+                      <view class="type">
+                        中医推拿服务
+                      </view>
+                      <view class="price">
+                        ¥188
+                      </view>
+                    </view>
+                    <view class="item_right">
+                      <image src="../../assets/images/default_binglixiangqing.png"></image>
+                      <view class="type">
+                        中医推拿服务
+                      </view>
+                      <view class="price">
+                        ¥188
+                      </view>
+                    </view>
+                </view>
+            </view>
+        </view> -->
+      </view>
+      <view class='result' >
+        测评结果：{{result.keyword}}
+      </view>
+  </view>
+</template>
+
+<script>
+  // const Wxchart = require('../../utils/wxchart.js')
+  import wepy from 'wepy'
+  import { showTost, showLoading } from '../../utils/common.js'
+  import WxParse from '../../utils/wxParse.js'
+  export default class AppointmentSuccess extends wepy.page {
+    config = {
+      navigationBarTitleText: '评估结果'
+    }
+
+    components = {
+
+    }
+    data = {
+      info: [],
+      result: []
+    }
+
+    computed = {
+    }
+
+    methods = {
+
+    }
+    // columnShow() {
+    //   let columns = {
+    //     canvasId: 'columnCanvas', // canvas-id
+    //     type: 'column', // 图表类型，可选值为pie, line, column, area, ring
+    //     categories: ['平和质', '气虚质', '阳虚质', '阴虚质', '气虚质', '阳虚质', '阴虚质', '气虚质', '阳虚质', '阴虚质'],
+    //     series: [{ // 数据列表
+    //       name: ' ', // 数据名称
+    //       data: [15, 20, 30, 37, 20, 30, 37, 20, 30, 37],
+    //       format: function (val, name) {
+    //         return val
+    //       },
+    //       color: '#26B7BC' // 配色，不传入则使用系统默认配色方案
+    //     }],
+    //     yAxis: {
+    //       format: function (val) {
+    //         return val
+    //       },
+    //       title: '',
+    //       disabled: false,
+    //       min: 0 // Y轴起始值
+    //     },
+    //     xAxis: {
+    //       disableGrid: false,
+    //       type: 'calibration'
+    //     },
+    //     width: 320, // 宽度，单位为px
+    //     height: 300, // 高度，单位为px
+    //     legend: false,
+    //     dataLabel: false,
+    //     extra: {
+    //       column: {
+    //         width: 10 // 柱状图每项的图形宽度，单位为px
+    //       }
+    //     }
+    //   }
+    //   let wxchart = new Wxchart(columns)
+    // }
+    onLoad(e) {
+      let that = this
+      showLoading()
+      let param = {
+        url: `/survey/score/getSurveyResultBySurvey/${e.id}/${e.AnswerId}`,
+        method: 'GET',
+        data: {},
+        header: {
+          'content-type': 'application/x-www-form-urlencoded' // 默认值
+        }
+      }
+      wepy.request(param).then((data) => {
+        that.info = data.resultData.memberInfo
+        that.result = data.resultData.result
+        that.result.intervenes.forEach((item) => {
+          let article = item.intervene
+          WxParse.wxParse('article', 'html', article, that, 0)
+        })
+        this.$apply()
+      }).catch((data) => {
+        showTost(data.resultDesc)
+        this.$apply()
+      })
+    }
+  }
+</script>

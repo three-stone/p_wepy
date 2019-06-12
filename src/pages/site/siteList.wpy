@@ -1,0 +1,194 @@
+<template>
+  <view class="site-list-container">
+    <view class="site-list-child" wx:for="{{siteList}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+      <navigator hover-class="none" url="/pages/site/siteDetails?id={{item.id}}" class="site-content">
+        <image class="site-image" src="{{item.logo}}"/>
+        <view class="site-content-child">
+          <view class="site-content-title">{{item.name}}</view>
+          <view class="site-content-label-container">
+            <view class="site-content-label-child" wx:for="{{item.serviceTimeList}}" wx:for-index="index" wx:for-item="items" wx:key="index">{{items}}</view>
+          </view>
+          <view class="site-content-label-location" >
+            <image class="site-content-label-image" src="https://rs01.kanghehealth.com/wx/image/d_list_icon_adr.png"/ >
+            <text>{{item.provinceName==''|| item.provinceName== null ? ' ': item.provinceName}} {{item.cityName==''|| item.cityName== null ? ' ': item.cityName}} {{item.districtName==''|| item.districtName== null ? ' ': item.districtName}} {{item.detailAddress==''|| item.detailAddress== null ? ' ': item.detailAddress}}</text>
+          </view>
+        </view>
+      </navigator>
+      <view class="btn-reserve-container">
+        <view class="btn-reserve" @tap="click({{item.id}},{{item.name}})">
+          <view>预约</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showTost, showLoading } from '../../utils/common.js'
+  export default class templates extends wepy.page {
+    config = {
+      'navigationBarBackgroundColor': '#ffffff',
+      'navigationBarTitleText': '网点列表',
+      'navigationBarTextStyle': 'black',
+      'enablePullDownRefresh': true,
+      'backgroundTextStyle': 'dark',
+      'onReachBottomDistance': 50
+    }
+
+    components = {
+    }
+
+    data = {
+      pageNo: 1,
+      Isload: false,
+      totalPages: '',
+      siteList: [
+        { imgUrl: '../../assets/images/test.png', siteTitle: '天河城康美健康屋（功能小屋）', labelList: [ '服务包销售', '中医推拿', '艾灸', '体质评估' ], location: '广州市天河区368号' },
+        { imgUrl: '../../assets/images/test.png', siteTitle: '天河城康美健康屋（功能小屋）', labelList: [ '服务包销售', '中医推拿', '艾灸', '体质评估' ], location: '广州市天河区368号' },
+        { imgUrl: '../../assets/images/test.png', siteTitle: '天河城康美健康屋（功能小屋）', labelList: [ '服务包销售', '中医推拿', '艾灸', '体质评估' ], location: '广州市天河区368号' },
+        { imgUrl: '../../assets/images/test.png', siteTitle: '天河城康美健康屋（功能小屋）', labelList: [ '服务包销售', '中医推拿', '艾灸', '体质评估' ], location: '广州市天河区368号' }
+      ]
+    }
+
+    methods = {
+      click (id, name) {
+        let ID = id === null || id === '' ? '' : id
+        let Name = name === null || name === '' ? '' : name
+        wepy.navigateTo({
+          url: '/pages/Appointment/AppointmentRegister?orgId=' + ID + '&orgName=' + Name
+        })
+      }
+    }
+
+    events = {
+    }
+
+    getData (No) {
+      let that = this
+      showLoading()
+      let param = {
+        url: 'relation/organization',
+        method: 'get',
+        data: { pageNo: No, pageSize: 8 },
+        header: {
+          'content-type': 'application/x-www-form-urlencoded' // 默认值
+        }
+      }
+      that.Isload = false
+      wepy.request(param).then((data) => {
+        wepy.hideLoading()
+        let arry = that.siteList
+        that.Isload = true
+        No > 1 ? that.siteList = arry.concat(data.content.list) : that.siteList = data.content.list
+        that.totalPages = data.content.totalPages
+        setTimeout(function () {
+          wepy.hideNavigationBarLoading()
+          wepy.stopPullDownRefresh()
+        }, 500)
+        this.$apply()
+      }).catch((data) => {
+        that.Isload = true
+        setTimeout(function () {
+          wepy.hideNavigationBarLoading()
+          wepy.stopPullDownRefresh()
+        }, 500)
+        showTost(that.resultDesc)
+      })
+    }
+    //  下拉刷新
+    onPullDownRefresh () {
+      if (this.Isload) {
+        wepy.showNavigationBarLoading()
+        this.getData(1)
+      }
+    }
+    //  下拉加载
+    onReachBottom () {
+      if (this.Isload && this.pageNo < this.totalPages) {
+        this.pageNo = this.pageNo + 1
+        this.getData(this.pageNo)
+      }
+    }
+    onLoad (option) {
+      showLoading()
+      this.getData(1)
+    }
+  }
+</script>
+<style lang="less">
+@import '../../styles/common.less';
+@30-padding: 50rpx;
+@full-width: 100%;
+page {
+  padding-top: 16rpx;
+  background: #eeeeee;
+}
+.site-list-container {
+  width: @full-width;
+  height: 100%;
+  background:rgba(245,245,245,1);
+  .site-list-child {
+    padding: 0 30rpx;
+    margin-bottom: 16rpx;
+    background:rgba(255,255,255,1);
+    .site-content {
+      display: flex;
+      padding: 30rpx 0 32rpx;
+      border-bottom: 1rpx solid rgba(234,234,234,1);
+      .site-image {
+        width: 108rpx;
+        height: 108rpx;
+      }
+      .site-content-child {
+        padding-left: 19rpx;
+        height: 108rpx;
+        .site-content-title {
+          font-size: 28rpx;
+          color: rgba(51,51,51,1);
+        }
+        .site-content-label-container {
+          .site-content-label-child {
+            display: inline-flex;
+            padding: 7rpx 10rpx;
+            margin-right: 15rpx;;
+            font-size: 24rpx;
+            color: rgba(153,153,153,1);
+            background: rgba(245,245,245,1);
+            border-radius: 2rpx;
+          }
+        }
+        .site-content-label-location {
+          font-size: 24rpx;
+          color: rgba(205,205,205,1);
+          .site-content-label-image {
+            margin-right: 7rpx;
+            width: 22rpx;
+            height: 20rpx;
+          }
+        }
+      }
+    }
+    .btn-reserve-container {
+      display: flex;
+      justify-content: flex-end;
+      padding: 20rpx 0;
+      .btn-reserve {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 150rpx;
+        height: 57rpx;
+        background: rgba(38,183,188,1);
+        border-radius: 29rpx;
+        font-size: 24rpx;
+        color: rgba(255,255,255,1);
+        line-height: 36rpx;
+      }
+    }
+  }
+  .site-list-child:last-child{
+    margin-bottom:0;
+  }
+}
+</style>

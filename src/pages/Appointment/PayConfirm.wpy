@@ -1,0 +1,148 @@
+<style lang="less">
+  @import '../../styles/common.less';
+page{
+  background:#F5F5F5;
+}
+.cells{
+  margin-bottom:16rpx;
+}
+.cell{
+  color:#333;
+  font-size:28rpx;
+}
+.address_desc{
+  padding:40rpx 30rpx 20rpx 30rpx;
+  color:#999;
+  width:100%;
+  box-sizing:border-box;
+  font-size:24rpx;
+}
+
+.cell radio{
+  transform:scale(0.8);
+}
+.disabled view{
+  color:#999;
+}
+.price{
+  font-size:42rpx;
+}
+ .sub_btn{
+    width:628rpx;
+    height:90rpx;
+    background:rgba(38,183,188,1);
+    border-radius:45rpx;
+    color:#fff;
+    font-size:32rpx;
+    text-align:center;
+    line-height:90rpx;
+    margin:0 auto;
+    margin-top:83rpx;
+  }
+  .icn image{
+      width:32rpx;
+      height:32rpx;
+    }
+</style>
+<template>
+  <view class="container">
+      <view class="address_desc">选择第三方支付</view>
+      <view class="cells">
+        <view class="cell">
+            <view class="cell__bd">
+                <view>需支付:<text class="price">￥{{money}}</text></view>
+            </view>
+        </view>
+      </view> 
+      <view class="cells">
+        <view class="cell" @tap="click">
+          <view class="cell__hd">
+           <imgae></imgae>
+          </view>
+          <view class="cell__bd">
+              <view>微信支付</view>
+          </view>
+          <view class="cell__ft icn">
+             <image wx:if="{{checked}}" src="https://rs02.kanghehealth.com/wx/image/icon_choose_sel.png"></image>
+             <image wx:else src="https://rs02.kanghehealth.com/wx/image/icon_choose_nor.png"></image>  
+          </view>
+        </view>
+      </view> 
+      <view class="sub_btn" @tap='topay'>确认支付</view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showLoading, showTost } from '../../utils/common.js'
+  export default class PayConfirm extends wepy.page {
+    config = {
+      navigationBarTitleText: '选择第三方支付'
+    }
+
+    components = {
+    }
+  
+    data = {
+      checked: false,
+      money: '',
+      orderCode: ''
+    }
+
+    computed = {
+    }
+
+    methods = {
+      click() {
+        this.checked = !this.checked
+      },
+      topay () {
+        if (this.checked) {
+          let orderid = this.orderCode
+          wx.login({
+            success: function(res) {
+              if (res.code) {
+                let param = {
+                  url: '/appUser/paymentOrder/payOrder',
+                  data: {'code': res.code, 'orderCode': orderid, 'payChannel': 'NATIVE', 'spbillCreateIp': '127.0.0.1', processType: 'DOCTOR'},
+                  method: 'post',
+                  header: {
+                    'content-type': 'application/json;charset=UTF-8'
+                  }
+                }
+                showLoading()
+                wepy.request(param).then((res) => {
+                  wepy.requestPayment({
+                    'timeStamp': res.content.paySign.timeStamp,
+                    'nonceStr': res.content.paySign.nonceStr,
+                    'package': res.content.paySign.package,
+                    'signType': 'MD5',
+                    'paySign': res.content.paySign.sign,
+                    'success': function(res) {
+                      wepy.redirectTo({
+                        url: '/pages/Appointment/AppointmentSuccess',
+                        success: function () {}
+                      })
+                    },
+                    'fail': function(res) {},
+                    'complete': function(res) {}
+                  })
+                }).catch((err) => {
+                  console.log(err)
+                })
+              } else {
+                console.log('登录失败！' + res.errMsg)
+              }
+            }
+          })
+        } else {
+          showTost('请先选择支付方式')
+        }
+      }
+    }
+    onLoad(option) {
+      this.orderCode = option.orderId
+      this.money = option.price
+    }
+  }
+</script>

@@ -1,0 +1,173 @@
+<script>
+// wepy
+import wepy from 'wepy'
+import khsy from 'internal/khsy'
+// es6 async 垫片
+import 'wepy-async-function'
+
+import { setStore } from 'wepy-redux'
+import configStore from './store'
+
+const store = configStore()
+setStore(store)
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/main/home',
+      'pages/LoginRegister/BaseInformation',
+      'pages/ClinicPay/ClinicPay',
+      'pages/advisory/Apply',
+      'pages/advisory/advisoryOL',
+      'pages/Discount/ServiceVolume',
+      'pages/webview/webview',
+      'pages/Discount/AmountCard',
+      'pages/Appointment/PayConfirm',
+      'pages/Appointment/AppointmentSubmit',
+      'pages/Appointment/AppointmentRegister',
+      'pages/Appointment/AppointmentServer',
+      'pages/ClinicPay/MyOrder',
+      'pages/doctorList/time',
+      'pages/healthInfor/healthInfor',
+      'pages/doctorList/doctorCenter',
+      'pages/Evaluate/Heath',
+      'pages/site/siteList',
+      'pages/site/siteDetails',
+      'pages/Evaluate/EvaluateSheet',
+      'pages/Evaluate/Result',
+      'pages/Evaluate/EvaluateRecord',
+      'pages/doctorList/doctorList',
+      'pages/Evaluate/AssessmentIndex',
+      'pages/LoginRegister/Login',
+      'pages/Evaluate/Answer',
+      'pages/healthInfor/healthInforDetails',
+      'pages/LoginRegister/Register',
+      'pages/LoginRegister/ResetPassword',
+      'pages/LoginRegister/SetPassword',
+      'pages/LoginRegister/CheckPhone',
+      'pages/LoginRegister/BindPhone',
+      'pages/LoginRegister/TermOfService',
+      'pages/Appointment/AppointmentSuccess',
+      'pages/Evaluate/DrugDetail',
+      'pages/Evaluate/Disease',
+      'pages/Evaluate/BaseInfo',
+      'pages/Detail/Detail',
+      'pages/Evaluate/InformedConsent'
+    ],
+     navigateToMiniProgramAppIdList: [
+        "wx8d82f1c3aa4d76b1",
+        "wxb8e20bad42a77beb"
+    ],
+    // subPackages: [ // 分包加载
+    //   {
+    //     'root': 'pages/testSubPackages',
+    //     'pages': [
+    //       'pages/test'
+    //     ]
+    //   }
+    // ],
+    navigateToMiniProgramAppIdList: [
+      'wx8d82f1c3aa4d76b1',
+      'wxb8e20bad42a77beb'
+    ],
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#fff',
+      navigationBarTitleText: '康合上医',
+      navigationBarTextStyle: 'black'     
+    }
+  }
+
+  globalData = {
+    userInfo: null
+  }
+
+  // 全局拦截器
+  constructor () {
+    super()
+    // 中间件
+    this.use('requestfix')
+    this.use('promisify')
+    // 拦截器
+    this.intercept('request', {
+      // 发出请求时的回调函数
+      config (config) {
+        // // 对所有request请求中的OBJECT参数对象统一附加时间戳属性
+        // config.timestamp = +new Date()
+        // console.log('config request: ', config)
+        this.requestUrl = config.url
+        if (config.url !== '/auth/login') { this.requestConfig = config } // 例如登录接口路径为 auth/login
+        if (config.url.indexOf('https') === -1) { config.url = khsy.$request_url + config.url }
+        config.method = config.method.toUpperCase()
+        config.header['X-APP-ID'] = khsy.$app_id // 将客户端标识传给服务端
+        config.header['X-APP-VER'] = khsy.$version // 将版本号传给服务端
+        config.header['X-APP-TOKEN'] = wepy.getStorageSync(khsy.$token_key) || null // 例如 token作为服务端唯一标识
+        if (config.data) { console.log(`request data to ${config.url}: `, config.data) } // 便于开发手机查看参数
+        return config
+      },
+      // 请求成功后的回调函数
+      success (response) {
+        // 可以在这里对收到的响应数据对象进行加工处理
+        // 必须返回响应数据对象，否则后续无法对响应数据进行处理
+        return new Promise((resolve, reject) => {
+          // log response
+          console.log(`response data from ${khsy.$request_url}${this.requestUrl}: `, response)
+          // 处理服务端返回的状态码
+          if (response.statusCode === 200) {
+            let responseBody = response.data // 返回体
+            // 接口交互
+            if (responseBody.result !== undefined) {
+              switch (responseBody.result) {
+                case '1':
+                  resolve(responseBody)
+                  break
+                case '-999':
+                case '-1':
+                  reject(responseBody)
+                  break
+                default:  // 增加不是以上返回码的都做reject处理
+                  reject(responseBody)
+                  break
+              }
+            } else if (responseBody.code.lenth !== 0) {
+              switch (responseBody.code) {
+                case '200':
+                  resolve(responseBody)
+                  break
+                case '-999':
+                case '-1':
+                  reject(responseBody)
+                  break
+                default:  // 增加不是以上返回码的都做reject处理
+                  reject(responseBody)
+                  break
+              }
+            }
+          }
+        })
+      },
+      // 请求失败后的回调函数
+      fail (errmsg) {
+        // 必须返回响应数据对象，否则后续无法对响应数据进行处理
+        console.log(`request fail:${errmsg}`)
+        return errmsg
+      },
+      // 请求完成时的回调函数(请求成功或失败都会被执行)
+      complete (response) {
+        wepy.hideLoading()
+        console.log(`request complete:${response}`)
+        return response
+      }
+    })
+  }
+
+  async onLaunch(options) {
+    const referrerInfo = options.referrerInfo
+    if (typeof (referrerInfo.extraData) !== 'undefined') {
+      wepy.setStorageSync('KHSY_TOKEN_KEY', referrerInfo.extraData.KHSY_TOKEN_KEY)
+      wepy.setStorageSync('memberId', referrerInfo.extraData.memberId)
+      wepy.setStorageSync('memberInfo', referrerInfo.extraData.memberInfo)
+    }
+  }
+}
+</script>

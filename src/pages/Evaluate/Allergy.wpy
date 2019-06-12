@@ -1,0 +1,87 @@
+<style lang="less">
+  @import '../../styles/common.less';
+page{
+	background:#f5f5f5;
+}
+.cells{
+    margin-top:16rpx;
+}
+.cell{
+	height:84rpx;
+}
+.text{
+    height:215rpx;
+}
+.cell .cell_hd,textarea{
+    height:100%;
+    width:100%;
+}
+.pl{
+    font-size:28rpx;
+    color:rgba(153,153,153,1);
+}
+.xz{
+    padding:0 30rpx 10rpx 30rpx;
+    width:100%;
+    box-sizing:border-box;
+    text-align:right;
+    color:#999;
+    font-size:24rpx;
+}
+  .sub_btn{
+    width:628rpx;
+    height:90rpx;
+    background:rgba(38,183,188,1);
+    border-radius:45rpx;
+    color:#fff;
+    font-size:32rpx;
+    text-align:center;
+    line-height:90rpx;
+    margin:0 auto;
+    margin-top:236rpx;
+  }
+</style>
+<template>
+  <view class="container">
+	<view class="cells">
+        <view class="cell">
+            <view class="cell__bd">
+               填写你对什么过敏
+            </view>          
+        </view>
+        <view class="cell text">
+        	<view class='cell_hd'>
+        		<textarea @input='InputChange' placeholder="青霉素、花生、海鲜……" auto-height  placeholder-class='pl'  maxlength='100'></textarea>
+        	</view>	
+        </view>
+        <view class='xz'>{{length}}/100</view>
+    </view>
+     <view class="sub_btn">保存</view>	
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class ChoicePerson extends wepy.page {
+    config = {
+      navigationBarTitleText: '过敏史'
+    }
+
+    components = {
+    }
+    data = {
+      length: 0
+    }
+
+    computed = {
+    }
+
+    methods = {
+      InputChange(e) {
+        this.length = e.detail.value.length
+      }
+    }
+
+    onLoad() {
+    }
+  }
+</script>

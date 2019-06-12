@@ -1,0 +1,496 @@
+<style lang="less">
+  @import '../../styles/common.less';
+page{
+  background:#F5F5F5;
+}
+.container{
+  padding-bottom:106rpx;
+}
+.desc{
+  padding-left:30rpx;
+  padding-top:40rpx;
+  padding-bottom:20rpx;
+  font-size:24rpx;
+  color:#999;
+   width:100%;
+   box-sizing:border-box;
+}
+.cells:before {
+    content: " ";
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: 1px;
+    border-top: 2px solid #eaeaea;
+    color: #e5e5e5;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+    z-index: 2;
+}
+.footer{
+  position: fixed;
+  bottom:0;
+  width:100%;
+  height:90rpx;
+  display:flex;
+  background:#fff;
+}
+.total{
+  height:100%;
+  display:flex;
+  flex:3;
+  padding-left:30rpx;
+  color:#333333;
+  font-size:24rpx;
+  align-items:center;
+}
+.total text{
+  color:#26B7BC;
+  font-size:24rpx;
+}
+.total .price{
+  color:#FF8600;
+  font-size:32rpx;
+  margin-left:10rpx;
+}
+.price{
+   color:#FF8600;
+}
+.go_pay{
+  display:flex;
+  flex:1.5;
+  background:#26B7BC;
+  justify-content:center;
+  align-items:center;
+  color:#FFFFFF;
+  font-size:32rpx;
+}
+.cell{
+  color:#333;
+  font-size:28rpx;
+}
+.address_desc{
+  padding:60rpx 0 20rpx 30rpx;
+  color:#999;
+  width:100%;
+  box-sizing:border-box;
+  font-size:24rpx;
+}
+
+
+.cell radio{
+  transform:scale(0.8);
+}
+.disabled view{
+  color:#999;
+}
+.cell__ft{
+  color:#333;
+}
+.boxwaper {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  z-index:99;
+}
+.box {
+  position: absolute;
+  width:100%;
+  height:100vh;
+  background: rgba(0, 0, 0, 0.2);
+}
+.style {
+  position: absolute;
+  height: 700rpx; 
+  width:100%;
+  z-index: 11;
+  background: #fff;
+  bottom: 0;
+  bottom: -100%;
+  padding: 0 34rpx;
+  box-sizing:border-box;
+}
+.but {
+  height: 100rpx;
+  box-sizing: border-box;
+  padding-bottom: 0rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1rpx solid #eaeaea;
+}
+.cell .price{
+  color:#FF8600;
+}
+.input_row{
+  width: 660rpx; 
+  margin: 0 auto; 
+  height: 98rpx;
+  margin-top:30rpx; 
+  position: relative;
+  display: flex; 
+  align-items: center;  
+   .pwd_item{
+    flex: 80rpx; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    height: 100%; 
+    border-bottom: 4rpx solid #ccc; 
+    position: relative;
+    margin-right:30rpx;
+      text{
+        width: 30rpx; 
+        height: 30rpx; 
+        border-radius: 30rpx; 
+        background-color: #333;
+      }
+  }
+}
+.pwd_item:nth-last-of-type(1) { margin-right: 0rpx; } 
+.forget_pwd{ 
+  float: right; 
+  margin: 30rpx;
+  margin-right:0; 
+  text-align: right; 
+  font-size: 24rpx; 
+  color: #26B7BC;
+}
+.input_control { 
+  position: relative; left: -300rpx; bottom: 0; width: 100rpx; height: 100rpx;
+}
+.not_set{
+  font-size:28rpx;
+  color:rgba(237,106,103,1);
+  margin-bottom:30rpx;
+}
+.set{
+  width:300rpx;
+  height:90rpx;
+  background:rgba(38,183,188,1);
+  border-radius:45rpx;
+  font-size:32rpx;
+  color:#fff;
+  line-height:90rpx;
+  text-align:center;
+  margin:0 auto;
+}
+</style>
+<template>
+  <view class="container">
+      <view class="cells" style="margin-bottom:16rpx">
+          
+            <view class="cell" wx:for="{{itemList}}" wx:key="*this">
+                <view class="cell__bd cell_access">
+                    <view >{{item.title}}</view>
+                </view>
+                <view class="cell__ft "  wx:if="{{item.price!=1}}"> 
+                  {{item.value}}
+                </view>
+                <view class="cell__ft price"  wx:else> 
+                  {{item.value}}
+                </view>
+            </view>
+
+      </view>
+      <view class="desc">
+          可用以下方式支付（可组合选择）
+      </view>
+        <view class="cells">
+            <navigator  class="cell {{servercart == 1 ? 'cell_access' : ''}}" url="{{servercart == 1 ? '/pages/Discount/ServiceVolume?type=' + servicecode : ''}}" hover-class="none">
+                <view class="cell__bd">
+                    <view>服务劵</view>
+                </view>
+                <view class="cell__ft">
+                   {{servercart == 1 ? stxt : '不可用'}} 
+                </view>
+            </navigator>
+            <navigator class="cell {{moneycart == 1 ? 'cell_access' : ''}}" url="{{moneycart == 1 ? '/pages/Discount/AmountCard?type=1&price=' + orderAmt : ''}}" hover-class="none">
+                <view class="cell__bd">
+                    <view>金额卡</view>
+                </view>
+                <view class="cell__ft {{  moneycart == 1 ?  'cell_access' : ''}}">
+                   {{moneycart == 1 ? mtxt : '不可用'}}
+                </view>
+            </navigator>
+        </view> 
+
+      <view class='footer'>
+          <view class="total">
+            需支付：
+            <text class="price">￥{{price}}</text>
+          </view>
+          <view class="go_pay" @tap='openPicker(0)'>提交预约</view>
+      </view>
+      <view wx:if="{{isOpen}}" class="boxwaper">
+        <view class="box"></view>
+        <view class="style" animation="{{Animation}}">
+          <view class="but">
+            <view></view>
+            <view style="font-size:32rpx;color:#333333;">请输入支付密码</view>
+            <view @tap='close'>X</view>
+          </view>
+          <view wx:if="{{isPayPassword}}" style="height: 369rpx;">
+              <view class='input_row' @catchtap='getFocus'>
+                  <view class='pwd_item' wx:for='{{6}}' wx:key='item' wx:for-index='i'>
+                      <text wx:if='{{pwdVal.length>i}}'></text>
+                  </view>
+              </view>
+              <view class='forget_pwd' catchtap='skip'>忘记支付密码？</view>
+              <input class='input_control' password type='number' focus='{{payFocus}}' @input='inputPwd' maxlength='6'/>
+          </view>
+          <view wx:else style="height: 169rpx; text-align:center;padding-top:200rpx">
+                <view class="not_set">您还没有设置支付密码</view>
+                <view class="set" @tap='skip'>去设置</view>
+          </view>
+        </view>
+     </view> 
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showLoading, showTost } from '../../utils/common.js'
+  import { GetServiceCard, GetAmountCard } from '../../apis/common.js'
+  export default class AppointmentSubmit extends wepy.page {
+    config = {
+      navigationBarTitleText: '预约信息确认'
+    }
+
+    components = {
+    }
+    data = {
+      Animation: {},
+      isOpen: false, // 是否展示密码输入层
+      pwdVal: '',  // 输入的密码
+      payFocus: false, // 文本框焦点
+      orderAmt: '', // 初始价格
+      isPayPassword: false,
+      itemList: [],
+      servercart: -1,
+      servicecode: '',
+      moneycart: -1,
+      price: '',
+      stxt: '可用',
+      mtxt: '可用',
+      discout: 0,
+      ServiceCartId: '',
+      ServiceValue: '',
+      obj: {}
+    }
+
+    computed = {
+    }
+
+    methods = {
+      click(e) {
+        this.idx = e.currentTarget.dataset.index
+      },
+      openPicker(flag) {
+        if (!!wepy.getStorageSync('ServiceCartId') || !!wepy.getStorageSync('AmountValue')) {
+          this.isOpen = true
+          this.payFocus = true
+          this._openClosePicker(0)
+        } else {
+          showLoading()
+          this.submitOrder()
+        }
+      },
+      close() {
+        this.payFocus = false
+        this._openClosePicker(1)
+        this.isOpen = false
+      },
+      getFocus () {
+        this.payFocus = true
+      },
+      inputPwd (e) {
+        let that = this
+        this.pwdVal = e.detail.value
+        if (e.detail.value.length >= 6) {
+          let param = {
+            url: '/assetsApi/assetsMemberVerify',
+            method: 'get',
+            data: {memberId: wepy.getStorageSync('memberId'), payPassword: this.pwdVal},
+            header: {
+              'content-type': 'application/x-www-form-urlencoded' // 默认值
+            }
+          }
+          showLoading()
+          wepy.request(param).then((res) => {
+            if (res.resultData.isSucceed) {
+              that.submitOrder()
+            } else {
+              showTost(res.resultDesc)
+            }
+          }).catch((res) => {
+            wepy.hideLoading()
+            showTost(res.resultDesc)
+          })
+        }
+      },
+      skip () {
+        wepy.navigateToMiniProgram({
+          appId: 'wx8d82f1c3aa4d76b1',
+          path: 'pages/setting/PasswordManagement',
+          extraData: {
+            memberId: wepy.getStorageSync('memberId'),
+            KHSY_TOKEN_KEY: wepy.getStorageSync('KHSY_TOKEN_KEY'),
+            memberInfo: wepy.getStorageSync('memberInfo')
+          },
+          envVersion: 'release',
+          success(res) {
+            // 打开成功
+          }
+        })
+      }
+    }
+    // 提交订单
+    submitOrder () {
+      let that = this
+      let param = {
+        url: '/appUser/bespeakOrder/createAppBespeakOrder',
+        method: 'post',
+        data: that.obj,
+        header: {
+          'content-type': 'application/json' // 默认值
+        }
+      }
+      wepy.request(param).then((res) => {
+        wepy.removeStorageSync('AmountValue')
+        wepy.removeStorageSync('ServiceCartId')
+        wepy.removeStorageSync('price')
+        wepy.hideLoading()
+        if (res.resultData.payAmt !== 0) {
+          wepy.redirectTo({
+            url: '/pages/Appointment/PayConfirm?orderId=' + res.resultData.orderCode + '&price=' + res.resultData.payAmt
+          })
+        } else {
+          wepy.redirectTo({
+            url: '/pages/Appointment/AppointmentSuccess'
+          })
+        }
+      }).catch((res) => {
+        that.payFocus = false
+        that.isOpen = false
+        wepy.hideLoading()
+        that._openClosePicker(1)
+        showTost(res.result)
+      })
+    }
+    // 弹出密码框动画
+    _openClosePicker(flag) {
+      let animationBox = wepy.createAnimation({
+        duration: 2000,
+        timingFunction: 'ease'
+      })
+      if (flag === 1) {
+        animationBox.bottom('-100%').step()
+      } else {
+        animationBox.bottom(0).step()
+      }
+      this.Animation = animationBox.export()
+      this.$apply()
+    }
+    onUnload () {
+      wepy.removeStorageSync('ServiceCartId')
+      wepy.removeStorageSync('AmountValue')
+      wepy.removeStorageSync('price')
+    }
+    onShow () {
+      if (!!wepy.getStorageSync('AmountValue')) {
+        let s = Number(this.orderAmt) - Number(wepy.getStorageSync('price')) > 0 ? Number(wepy.getStorageSync('price')) : Number(this.orderAmt)
+        this.mtxt = '-¥' + s
+        this.stxt = '不可用'
+        this.discout = s
+        let objs = this.obj
+        objs.cardInfoList = wepy.getStorageSync('AmountValue')
+        delete objs.couponId
+        delete objs.couponAmt
+        this.price = Number(this.orderAmt) - this.discout
+        this.obj = objs
+      } else if (!!wepy.getStorageSync('ServiceCartId')) {
+        this.stxt = '-¥' + this.orderAmt
+        this.mtxt = '不可用'
+        this.discout = this.orderAmt
+        let objs = this.obj
+        objs.couponId = wepy.getStorageSync('ServiceCartId') // 服务券码
+        objs.couponAmt = this.discout // 服务券金额
+        delete objs.cardInfoList
+        this.price = 0
+        this.obj = objs
+      } else {
+        this.discout = 0
+      }
+    }
+    onLoad(e) {
+      let that = this
+      this.itemList = [
+        {'title': '预约人', 'value': e.name},
+        {'title': '服务机构', 'value': e.org},
+        {'title': '服务人员', 'value': e.doctor},
+        {'title': '服务项目', 'value': e.server},
+        {'title': '预约时间', 'value': e.time + ' ' + e.date},
+        {'title': '服务价格', 'value': '¥' + e.price, 'price': 1}
+      ]
+      this.price = e.price
+      this.orderAmt = e.price
+      this.obj = {
+        actAmt: 0,
+        bespeakDate: e.time, // 预约日期
+        bespeakProject: e.server, // 服务项目
+        bespeakProjectCode: e.serverid, // 服务项目id
+        bespeakTime: e.date, // 预约时间
+        bespeakType: e.type, // 预约类型(1:服务预约,2:预约挂号)
+        bespeakUnitCode: e.orgId, // 服务机构(出诊机构)
+        bespeakUnitName: e.org, //  服务机构名称(出诊机构)
+        doctorId: e.doctorId, // 医生id
+        doctorName: e.doctor, // 医生姓名
+        memberCode: wepy.getStorageSync('memberInfo').memberCode,
+        memberName: e.name,
+        mobileNo: wepy.getStorageSync('memberInfo').phone,
+        orderAmt: e.price,
+        schedId: e.schedId
+      }
+      this.servicecode = e.serverid
+      // 判断是否设置了 密码
+      let param = {
+        url: '/assetsApi/' + wepy.getStorageSync('memberId'),
+        method: 'get',
+        data: {},
+        header: {
+          'content-type': 'application/x-www-form-urlencoded' // 默认值
+        }
+      }
+      showLoading()
+      wepy.request(param).then((res) => {
+        wepy.hideLoading()
+        this.isPayPassword = res.resultData.isPayPassword
+      }).catch((res) => {
+        wepy.hideLoading()
+      })
+      // 获取可用优惠券
+      let params = GetServiceCard({memberId: wepy.getStorageSync('memberId'), singleServiceCode: e.serverid, pageSize: 10, pageNo: 1})
+      wepy.request(params).then((res) => {
+        res.content !== null && res.content.list.length !== 0 ? that.servercart = 1 : that.servercart = -1
+        this.$apply()
+      }).catch((res) => {
+        console.log(res)
+      })
+      // 获取可用金额卡 e4883e10bc5741be9bbd0832ae603609,
+      let paramss = GetAmountCard({memberId: wepy.getStorageSync('memberId'), type: 1})
+      wepy.request(paramss).then((res) => {
+        res.resultData.length !== 0 ? that.moneycart = 1 : that.moneycart = -1
+        this.$apply()
+      }).catch((res) => {
+        console.log(res)
+      })
+      this.$apply()
+    }
+  }
+</script>

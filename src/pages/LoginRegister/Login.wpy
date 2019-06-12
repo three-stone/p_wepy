@@ -1,0 +1,181 @@
+<style lang="less">
+  @import '../../styles/common.less';
+  page{
+    background:#fff;
+  }
+  .cell{
+    padding:50rpx 60rpx 30rpx 60rpx;
+    height:120rpx;
+    box-sizing:border-box;
+
+  }
+  .cell__bd view,.cell__ft{
+    font-size:28rpx;
+    color:#333333;
+  }
+  .cell:before {
+    left:60rpx;
+    right:60rpx;
+  }
+    .cell_b:after{
+    content: " ";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 1px;
+    border-top: 4rpx solid #EAEAEA;
+    color: #e5e5e5;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+    left:60rpx;
+    right:60rpx;
+    z-index: 2;
+  }
+  .sub_btn{
+    width:628rpx;
+    height:90rpx;
+    background:rgba(38,183,188,1);
+    border-radius:45rpx;
+    color:#fff;
+    font-size:32rpx;
+    text-align:center;
+    line-height:90rpx;
+    margin:0 auto;
+    margin-top:160rpx;
+  }
+  .disabled{
+    opacity:0.5;
+  }
+  .pld{
+    font-size:28rpx;
+    color:rgba(205,205,205,1);
+  }
+  .head{
+    height:291rpx;
+    width:100%;
+    background:url(https://rs02.kanghehealth.com/wx/image/login_bg_01.png) 0 0 no-repeat;
+    background-size:100% 291rpx;
+    color:#fff;
+    font-size:48rpx;
+    padding-top:139rpx;
+    box-sizing:border-box;
+    padding-left:59rpx;
+    margin-bottom:16rpx;
+  }
+  .link{
+    display:flex;
+    width:628rpx;
+    padding:20rpx;
+    margin:0 auto;
+    box-sizing:border-box;
+    justify-content:space-between;
+        navigator{
+          color:#26B7BC;
+          font-size:26rpx;
+        }
+  }
+  .footer{
+    position: fixed;
+    width:500rpx;
+    left:125rpx;
+    bottom:38rpx;
+    font-size:24rpx;
+    color:#333333;
+    display:flex;
+      navigator{
+          color:#26B7BC;
+          font-size:22rpx;
+      }
+  }
+</style>
+<template>
+  <view class="container">
+      <view class="head">
+        登录
+      </view>
+      <view class="cells">
+          <view class="cell">
+              <view class="cell__bd">
+                 <input type="text" placeholder="手机号" value="{{phone}}" @input="PhoneChange" placeholder-class="pld"></input>
+              </view>
+          </view>
+          <view class="cell cell_b">
+              <view class="cell__bd">
+                  <input type="password" placeholder="登录密码" value="{{pw}}" @input="PwChange" placeholder-class="pld"></input>
+              </view>
+          </view>
+      </view>
+      <view class="sub_btn {{phone.length === 0 ? 'disabled' : '' }}" @tap="{{phone.length !== 0 ? 'login' : '' }}">登录</view>
+      <view class='link'>
+        <navigator url='/pages/LoginRegister/Register' hover-class="none">快速注册</navigator>
+        <navigator  url='/pages/LoginRegister/CheckPhone' hover-class="none">忘记密码？</navigator>
+      </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { showTost, showLoading } from '../../utils/common.js'
+  export default class Login extends wepy.page {
+    config = {
+      navigationBarTitleText: ' '
+    }
+
+    components = {
+    }
+    data = {
+      phone: '',
+      pw: ''
+    }
+
+    computed = {
+    }
+
+    methods = {
+      PhoneChange (e) {
+        this.phone = e.detail.value
+      },
+      PwChange (e) {
+        this.pw = e.detail.value
+      },
+      login () {
+        if (this.phone.length !== 0 && this.pw.length !== 0) {
+          if (!(/^1[3|4|5|6|7|8|9]\d{9}$/.test(this.phone))) {
+            showTost('手机号不正确')
+            return
+          }
+          showLoading()
+          let param = {
+            url: 'appUser/login/login',
+            method: 'get',
+            data: {phone: this.phone, password: this.pw, systemType: 2},
+            header: {
+              'content-type': 'application/x-www-form-urlencoded' // 默认值
+            }
+          }
+          wepy.request(param).then((data) => {
+            wepy.hideLoading()
+            wepy.setStorageSync('KHSY_TOKEN_KEY', data.resultData.jwtToken)
+            wepy.setStorageSync('memberId', data.resultData.memberId)
+            wepy.setStorageSync('memberInfo', data.resultData)
+            wepy.reLaunch({
+              url: '/pages/main/home'
+            })
+          }).catch((error) => {
+            wepy.hideLoading()
+            showTost(error.resultDesc)
+          })
+        } else {
+          showTost('密码不能为空')
+        }
+      }
+    }
+    events = {
+    }
+    onLoad() {
+    }
+  }
+</script>

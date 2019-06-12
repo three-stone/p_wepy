@@ -1,0 +1,145 @@
+<style lang="less">
+  @import '../../styles/common.less';
+  page{
+    background:#F5F5F5;
+  }
+  .container{
+    padding-bottom:51rpx;
+  }
+  .cell{
+    padding:30rpx;
+    height:100rpx;
+    box-sizing:border-box;
+
+  }
+  .cell__bd view,.cell__ft{
+    font-size:28rpx;
+    color:#333333;
+  }
+  .cells{
+    margin-bottom:16rpx;
+  }
+  .cells .cell_tit{
+    height:64rpx;
+  }
+  .add{
+    width:36rpx;
+    height:36rpx;
+    color:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#26B7BC;
+    font-size:36rpx;
+    border-radius:50%;
+  }
+  .sub_btn{
+    width:628rpx;
+    height:90rpx;
+    background:rgba(38,183,188,1);
+    border-radius:45rpx;
+    color:#fff;
+    font-size:32rpx;
+    text-align:center;
+    line-height:90rpx;
+    margin:0 auto;
+    margin-top:127rpx;
+  }
+  .disabled{
+    opacity:0.5;
+  }
+ .selec .cell__ft{
+    color:#999999;
+  }
+ .selec .cell__l{
+    font-size:28rpx;
+    color:#333333;
+  }
+</style>
+<template>
+  <view class="container">
+      <view class="cells selec">
+           <view class="cell cell_access" data-index='0' @tap="open">
+              <view class="cell__bd">
+                  <view>药品名称</view>
+              </view>
+              <view class="cell__ft">请填写</view>
+               <view class="cell__l" hidden>大学本科</view>
+          </view>
+          <view class="cell cell_access" data-index='1' @tap="open">
+              <view class="cell__bd">
+                  <view>用药途径</view>
+              </view>
+              <view class="cell__ft">农、林、牧、渔</view>
+              <view class="cell__l"></view>
+          </view>
+          <view class="cell cell_access" data-index='2' @tap="open">
+              <view class="cell__bd">
+                  <view>药品规格</view>
+              </view>
+              <view class="cell__ft">请填写</view>
+          </view>
+            <view class="cell cell_access" data-index='3'>
+              <view class="cell__bd">
+                  <view>每次用量</view>
+              </view>
+              <view class="cell__ft">填写数值</view>
+              <view class="cell__l"></view>
+          </view>
+          <view class="cell cell_access" data-index='3' @tap="open">
+              <view class="cell__bd">
+                  <view>使用频率</view>
+              </view>
+              <view class="cell__ft">无</view>
+              <view class="cell__l"></view>
+          </view>
+      </view>
+      <view class="sub_btn disabled">保存</view>
+      <repeat for="{{list}}" key="index" index="index" item="item" wx:if="{{index == SelectedIndex}}">
+        <picker1  :listData="item" ></picker1>
+      </repeat>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Select from '../../components/select'
+  export default class BaseInfo extends wepy.page {
+    config = {
+      navigationBarTitleText: '添加药品'
+    }
+
+    components = {
+      picker1: Select
+    }
+    data = {
+      list: [
+         {Name: ['李家康（自己）', '陈颖茵（夫妻）', '李远航（父母）']},
+         {Shop: ['广东省中医院慢病防治诊疗中心', '康美健康小屋广州天河城店（功能店）', '康美健康小屋广州海富花园店（社区店）']},
+         {Type: ['专家面诊', '中医推拿', '中医艾灸']},
+         {Doctor: ['不指定', '程兰（主任医师）', '张丹（健康顾问）']},
+         {Data: [' ', '今天', '1月23日（星期二）', '665']},
+         {Time: [' ', '10:00-11:00', '11:00-12:00']}
+      ],
+      SelectedIndex: '',
+      SelectedText: ''
+    }
+
+    computed = {
+    }
+
+    methods = {
+      open(e) {
+        this.SelectedIndex = e.currentTarget.dataset.index
+        this.$invoke('picker1', 'openPicker', '0')
+      }
+    }
+    events = {
+      'showchange': function (type) {
+        this.isOpen = type
+      }
+    }
+    onLoad() {
+    }
+  }
+</script>
