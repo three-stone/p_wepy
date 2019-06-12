@@ -12,7 +12,7 @@
         <!------------------------------订单-------------------------------->
          <view hidden="{{activeIndex != 0}}">
             <view class="empty" hidden="{{MallOrderCount != 0}}">
-                <image class="empty-image" src="https://rs02.kanghehealth.com/wx/image/default_binglixiangqing@2x.png" />
+                <image class="empty-image" src="image/default_binglixiangqing@2x.png" />
                 <text class="empty-text">您还没有任何严选订单记录</text>
             </view>
             <view hidden="{{MallOrderCount == 0}}">  
@@ -50,7 +50,7 @@
         <!------------------------------预约订单-------------------------------->
         <view   hidden="{{activeIndex !=1}}">
             <view class="empty" hidden="{{AppointOrderCount != 0}}">
-                <image class="empty-image" src="https://rs02.kanghehealth.com/wx/image/default_binglixiangqing@2x.png" />
+                <image class="empty-image" src="image/default_binglixiangqing@2x.png" />
                 <text class="empty-text">您还没有任何预约订单记录</text>
             </view>
             <view hidden="{{AppointOrderCount == 0}}">
@@ -75,7 +75,7 @@
   
         <view   hidden="{{activeIndex != 2}}">
             <view class="empty" hidden="{{PrescriptionOrderCount != 0}}">
-                <image class="empty-image" src="https://rs02.kanghehealth.com/wx/image/default_binglixiangqing@2x.png" />
+                <image class="empty-image" src="image/default_binglixiangqing@2x.png" />
                 <text class="empty-text">您还没有任何处方订单记录</text>
             </view>
             <view hidden="{{PrescriptionOrderCount == 0}}">

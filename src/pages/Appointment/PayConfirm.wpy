@@ -63,8 +63,8 @@ page{
               <view>微信支付</view>
           </view>
           <view class="cell__ft icn">
-             <image wx:if="{{checked}}" src="https://rs02.kanghehealth.com/wx/image/icon_choose_sel.png"></image>
-             <image wx:else src="https://rs02.kanghehealth.com/wx/image/icon_choose_nor.png"></image>  
+             <image wx:if="{{checked}}" src="image/icon_choose_sel.png"></image>
+             <image wx:else src="image/icon_choose_nor.png"></image>  
           </view>
         </view>
       </view> 

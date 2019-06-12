@@ -27,11 +27,11 @@
       margin:20rpx 0 13rpx 0;
     }
     .left{
-      background:url(https://rs02.kanghehealth.com/wx/image/c_analysis_bg_test.png) 0 0 no-repeat;
+      background:url(image/c_analysis_bg_test.png) 0 0 no-repeat;
       background-size:328rpx 328rpx;
     }
     .right{
-      background:url(https://rs02.kanghehealth.com/wx/image/c_analysis_bg_record.png) 0 0 no-repeat;
+      background:url(image/c_analysis_bg_record.png) 0 0 no-repeat;
       background-size:328rpx 328rpx;
     }
 }
@@ -46,12 +46,12 @@
   <view class="container">
     <view class="imgbox">
       <navigator url='/pages/Evaluate/EvaluateSheet' hover-class="none" class="left">
-        <image src='https://rs02.kanghehealth.com/wx/image/c_analysis_icon_test.png'></image>
+        <image src='image/c_analysis_icon_test.png'></image>
         <view class='tit'>测评量表</view>
         <view>通过量表进行自测</view>
       </navigator>
        <navigator url='/pages/Evaluate/EvaluateRecord' hover-class="none" class='right'>
-        <image src='https://rs02.kanghehealth.com/wx/image/c_analysis_icon_record.png'></image>
+        <image src='image/c_analysis_icon_record.png'></image>
         <view class='tit'>测评记录</view>
         <view>查看过往测评记录</view>
       </navigator>

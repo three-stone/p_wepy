@@ -22,68 +22,6 @@
       <view class="content">{{detil.organizationService}}</view>
     </view>
   </view>
-  <!-- 服务 -->
-<!--   <view class="service-title">服务人员</view>
-  <view class="service-container"> -->
-<!--     <view class="doctor-list-container">
-  <view class="doctor-list-child" wx:for="{{doctorList}}" wx:for-index="index" wx:for-item="item" wx:key="index">
-    <view class="doctor-content">
-      <image class="doctor-image" src="{{item.imgUrl}}"/>
-      <view class="doctor-content-child">
-        title
-        <text class="doctor-content-name">{{item.doctorName}}</text>
-        <text class="doctor-content-title">{{item.doctorTitle}}</text>
-        label
-        <view class="doctor-content-position-container">
-          <view class="doctor-content-label-child" wx:for="{{item.labelList}}" wx:for-index="index" wx:for-item="items" wx:key="index">{{items}}</view>
-          <view class="doctor-content-position" >{{item.position}}</view>
-        </view>
-        specialize
-        <view class="doctor-content-specialize">
-          <text>{{item.specialize}}</text>
-        </view>
-      </view>
-    </view>
-    <view class="btn-reserve-container">
-      <view class="btn-reserve">
-        <view>咨询</view>
-      </view>
-      <view class="btn-reserve">
-        <view>预约</view>
-      </view>
-    </view>
-  </view>
-</view> -->
-<!--   <view class="doctor-list-container">
-  <view class="doctor-list-child" wx:for="{{doctorList}}" wx:for-index="index" wx:for-item="item" wx:key="index">
-    <view class="doctor-content">
-      <image class="doctor-image" src="{{item.avatar == ''? 'https://rs02.kanghehealth.com/wx/image/default_doctor.png' : item.avatar }}"/>
-      <view class="doctor-content-child">
-        title
-        <text class="doctor-content-name">{{item.doctorName}}</text>
-        <text class="doctor-content-title">{{item.doctorTitle}}</text>
-        label
-        <view class="doctor-content-position-container">
-          <view class="doctor-content-label-child" wx:for="{{item.labelList}}" wx:for-index="index" wx:for-item="items" wx:key="index">{{items}}</view>
-          <view class="doctor-content-position" >{{item.organizationName}}</view>
-        </view>
-        specialize
-        <view class="doctor-content-specialize">
-          <text>{{item.point}}</text>
-        </view>
-      </view>
-    </view>
-    <view class="btn-reserve-container">
-      <view class="btn-reserve">
-        <navigator url='/pages/advisory/advisoryOL?id={{item.accountId}}' hover-class='none'>咨询</navigator>
-      </view>
-      <view class="btn-reserve {{item.isConsult ? '':'unselect'}}">
-        <navigator url="{{item.isConsult ? '':'/pages/Appointment/AppointmentRegister'}}" hover-class='none'>预约</navigator>
-      </view>
-    </view>
-  </view>
-</view> -->
-<!--   </view> -->
   <view></view>
 </template>
 
@@ -108,7 +46,7 @@
       doctorList: [],
       imgalist: [],
       markers: [{
-        iconPath: 'https://rs01.kanghehealth.com/wx/image/d_list_icon_adr.png',
+        iconPath: 'image/d_list_icon_adr.png',
         id: 0,
         latitude: '',
         longitude: '',

@@ -9,7 +9,7 @@
             <view class="site-content-label-child" wx:for="{{item.serviceTimeList}}" wx:for-index="index" wx:for-item="items" wx:key="index">{{items}}</view>
           </view>
           <view class="site-content-label-location" >
-            <image class="site-content-label-image" src="https://rs01.kanghehealth.com/wx/image/d_list_icon_adr.png"/ >
+            <image class="site-content-label-image" src="image/d_list_icon_adr.png"/ >
             <text>{{item.provinceName==''|| item.provinceName== null ? ' ': item.provinceName}} {{item.cityName==''|| item.cityName== null ? ' ': item.cityName}} {{item.districtName==''|| item.districtName== null ? ' ': item.districtName}} {{item.detailAddress==''|| item.detailAddress== null ? ' ': item.detailAddress}}</text>
           </view>
         </view>

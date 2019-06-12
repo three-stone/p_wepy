@@ -5,7 +5,7 @@
         <view class='chat-time'>{{item.msgTime}}</view>
         <view class="chat-item {{item.isSelfSend ? 'flex' : ''}}" wx:if="{{item.userAction !== 2&&item.userAction !== 1}}">
             <view class='avatar'>
-              <image style="width:40px;height:40px;border-radius:50%;" mode= "scaleToFill" src="{{item.avatarUrl == ''?'https://rs02.kanghehealth.com/wx/image/default_portrait.png':item.avatarUrl}}"></image>
+              <image style="width:40px;height:40px;border-radius:50%;" mode= "scaleToFill" src="{{item.avatarUrl == ''?'image/default_portrait.png':item.avatarUrl}}"></image>
             </view>
             <view class='content' wx:if="{{item.imgurl.length!== 0&& item.imgurl!=''}}"><image class='img' src='{{item.imgurl}}'></image></view>
             <view class='content qipao' wx:else>{{item.msgContent}}</view>
@@ -13,7 +13,7 @@
 
         <view class="chat-item {{item.isSelfSend ? 'flex' : ''}}" wx:if="{{item.userAction == 2}}">
             <view class='avatar'>
-              <image style="width:40px;height:40px;border-radius:50%;" mode= "scaleToFill" src="{{item.avatarUrl == ''?'https://rs02.kanghehealth.com/wx/image/default_portrait.png':item.avatarUrl}}"></image>
+              <image style="width:40px;height:40px;border-radius:50%;" mode= "scaleToFill" src="{{item.avatarUrl == ''?'image/default_portrait.png':item.avatarUrl}}"></image>
             </view>
             <view class='content bgfff'>
               <view class='title'>{{item.title}}</view>

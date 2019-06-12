@@ -12,7 +12,7 @@
           </view>
           <view class="cell__ft">
             <view class="icons">
-              <view style="background:url({{staff.portrait == ''? 'https://rs02.kanghehealth.com/wx/image/default_doctor.png' : staff.portrait }}) center no-repeat;background-size:cover;"></view>
+              <view style="background:url({{staff.portrait == ''? 'image/default_doctor.png' : staff.portrait }}) center no-repeat;background-size:cover;"></view>
             </view>
           </view>
       </view>
@@ -158,7 +158,7 @@
   width: @full-width;
   height: 209rpx;
   padding-top:150rpx;
-  background-image:url(https://rs01.kanghehealth.com/wx/image/doctorBg.png);
+  background-image:url(image/doctorBg.png);
   background-repeat: no-repeat;
   background-size:100% 309rpx;
 }

@@ -1,6 +1,6 @@
 <style lang="less">
 page{
-  background:url(https://rs02.kanghehealth.com/wx/image/bg.png) 0 0 no-repeat;
+  background:url(image/bg.png) 0 0 no-repeat;
   background-size:100% 100vh;
 }
 .container{
@@ -62,15 +62,15 @@ page{
   color:#fff;
 }
 .one .type{
-  background:url(https://rs02.kanghehealth.com/wx/image/singlechoicequestion.png) 0 0 no-repeat;
+  background:url(image/singlechoicequestion.png) 0 0 no-repeat;
   background-size:200rpx 60rpx;
 }
 .many .type{
-  background:url(https://rs02.kanghehealth.com/wx/image/multiplechoicequestions.png) 0 0 no-repeat;
+  background:url(image/multiplechoicequestions.png) 0 0 no-repeat;
   background-size:200rpx 60rpx;
 }
 .blank .type{
-  background:url(https://rs02.kanghehealth.com/wx/image/completion.png) 0 0 no-repeat;
+  background:url(image/completion.png) 0 0 no-repeat;
   background-size:200rpx 60rpx;
 }
 .many .c_item{
@@ -176,12 +176,12 @@ margin-top:34rpx;
           <!--填空-->
           <view class="btn_box" >
             <view class="left" @tap="prev">
-              <image wx:if="{{s_idx !=0 }}" src="https://rs02.kanghehealth.com/wx/image/left_b.png"></image>
-              <image wx:else src="https://rs02.kanghehealth.com/wx/image/left_h.png"></image>
+              <image wx:if="{{s_idx !=0 }}" src="image/left_b.png"></image>
+              <image wx:else src="image/left_h.png"></image>
             </view>
             <view class="right" @tap="next">
-              <image wx:if="{{s_idx !=questionList.length-1}}" src="https://rs02.kanghehealth.com/wx/image/right_b.png"></image>
-              <image wx:else src="https://rs02.kanghehealth.com/wx/image/right_h.png"></image>
+              <image wx:if="{{s_idx !=questionList.length-1}}" src="image/right_b.png"></image>
+              <image wx:else src="image/right_h.png"></image>
             </view>
           </view>
         </view>

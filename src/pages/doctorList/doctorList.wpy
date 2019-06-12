@@ -2,7 +2,7 @@
   <view class="doctor-list-container">
     <view class="doctor-list-child" wx:for="{{doctorList}}" wx:for-index="index" wx:for-item="item" wx:key="index">
       <navigator url='/pages/doctorList/doctorCenter?id={{item.doctorId}}' class="doctor-content" hover-class='none'>
-        <view class='doctor-image' style="background:url({{item.avatar == ''? 'https://rs02.kanghehealth.com/wx/image/default_doctor.png' :item.avatar}}) center no-repeat;background-size:cover;"></view>
+        <view class='doctor-image' style="background:url({{item.avatar == ''? 'image/default_doctor.png' :item.avatar}}) center no-repeat;background-size:cover;"></view>
         <view class="doctor-content-child">
           <!-- title -->
           <text class="doctor-content-name">{{item.doctorName}}</text>

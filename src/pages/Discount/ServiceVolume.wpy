@@ -22,7 +22,7 @@ page{
   height:240rpx;
   align-items:center;
   margin-bottom:21rpx;
-  background:url(https://rs02.kanghehealth.com/wx/image/a_bg_coupon.png) 0 0 no-repeat;
+  background:url(image/a_bg_coupon.png) 0 0 no-repeat;
   background-size:100% 240rpx;
   border-radius:8px;
   padding:50rpx 61rpx 40rpx 42rpx;
@@ -111,8 +111,8 @@ checkbox .wx-checkbox-input.wx-checkbox-input-checked::before{
                     <view class='time'>有效期：截止 {{item.validityEnd}}</view>
                 </view>
                 <view class='checkbox'> 
-                  <image wx:if="{{selected == index}}" src="https://rs02.kanghehealth.com/wx/image/icon_choose_sel.png"></image>
-                  <image wx:else src="https://rs02.kanghehealth.com/wx/image/icon_choose_nor.png"></image>  
+                  <image wx:if="{{selected == index}}" src="image/icon_choose_sel.png"></image>
+                  <image wx:else src="image/icon_choose_nor.png"></image>  
                 </view>
             </view>
            

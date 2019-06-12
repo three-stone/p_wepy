@@ -34,7 +34,7 @@ font-size:32rpx;
 <template>
   <view class="container" >
       <view class="nothing" >
-          <image src='https://rs02.kanghehealth.com/wx/image/msg_icon_success.png' ></image>
+          <image src='image/msg_icon_success.png' ></image>
           <view>您已经完成预约，详情可以在“我的订单”中查看</view>
       </view>
       <!-- <navigator url='/pages/ClinicPay/ClinicPay' hover-class='none' class='goorder'>查看订单</navigator>  --> 

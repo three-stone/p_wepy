@@ -134,15 +134,15 @@
   <!-- nav-bottom -->
   <view class="nav-bottom flex-container">
     <view class="nav-bottom-home flex-child nav-bottom-child">
-      <image class="icon-tab" mode="aspectFit" src="https://rs02.kanghehealth.com/wx/image/tab_home.png"/>
+      <image class="icon-tab" mode="aspectFit" src="image/tab_home.png"/>
       <text class="nav-bottom-text">医疗</text>
     </view>
     <view class="nav-bottom-personal flex-child nav-bottom-child" @tap='jump'>
-      <image class="icon-tab" mode="aspectFit" src="https://rs01.kanghehealth.com/wx/image/tab_b_shop_nor.png"/>
+      <image class="icon-tab" mode="aspectFit" src="image/tab_b_shop_nor.png"/>
       <text class="nav-bottom-text">商城</text>
     </view>
     <view class="nav-bottom-personal flex-child nav-bottom-child" @tap="skip">
-      <image class="icon-tab" mode="aspectFit" src="https://rs02.kanghehealth.com/wx/image/tab_me.png"/>
+      <image class="icon-tab" mode="aspectFit" src="image/tab_me.png"/>
       <text class="nav-bottom-text" >我的</text>
     </view>
   </view>
@@ -172,10 +172,10 @@
       siteList: [],
       sitlabey: [],
       testNavBarObj: [
-        { pic: 'https://rs02.kanghehealth.com/wx/image/a_icon_appointment.png', url: '/pages/Appointment/AppointmentRegister', navChildTitle: '预约挂号' },
-        { pic: 'https://rs02.kanghehealth.com/wx/image/a_icon_service.png', navChildTitle: '服务预约', url: '/pages/Appointment/AppointmentServer' },
-        { pic: 'https://rs02.kanghehealth.com/wx/image/a_icon_Outpatient.png', navChildTitle: '门诊缴费', url: '/pages/ClinicPay/ClinicPay' },
-        { pic: 'https://rs02.kanghehealth.com/wx/image/a_icon_Health.png', navChildTitle: '健康评估', url: '/pages/Evaluate/Heath' }
+        { pic: 'image/a_icon_appointment.png', url: '/pages/Appointment/AppointmentRegister', navChildTitle: '预约挂号' },
+        { pic: 'image/a_icon_service.png', navChildTitle: '服务预约', url: '/pages/Appointment/AppointmentServer' },
+        { pic: 'image/a_icon_Outpatient.png', navChildTitle: '门诊缴费', url: '/pages/ClinicPay/ClinicPay' },
+        { pic: 'image/a_icon_Health.png', navChildTitle: '健康评估', url: '/pages/Evaluate/Heath' }
       ],
       centerNav: [],
       Doctorlist: [],
