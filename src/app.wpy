@@ -164,7 +164,7 @@ export default class extends wepy.app {
   async onLaunch(options) {
     const referrerInfo = options.referrerInfo
     if (typeof (referrerInfo.extraData) !== 'undefined') {
-      wepy.setStorageSync('KHSY_TOKEN_KEY', referrerInfo.extraData.KHSY_TOKEN_KEY)
+      wepy.setStorageSync('TOKEN_KEY', referrerInfo.extraData.TOKEN_KEY)
       wepy.setStorageSync('memberId', referrerInfo.extraData.memberId)
       wepy.setStorageSync('memberInfo', referrerInfo.extraData.memberInfo)
     }
